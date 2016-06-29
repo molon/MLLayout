@@ -120,6 +120,7 @@
                              l.bottom = 10.0f;
                          }],
                          [MLLayout layoutWithTagView:_bkgView block:^(MLLayout * _Nonnull l) {
+                             l.marginLeft = l.marginRight = 10.0f;
                              //test for round pixel
                              l.padding = UIEdgeInsetsMake(10.34f, 15.37f, 10.5608f, 15.3567f);
                              
