@@ -28,8 +28,6 @@
 @property (nonatomic, strong) UIButton *replayButton;
 @property (nonatomic, strong) UIButton *favButton;
 
-@property (nonatomic, strong) MLLayout *layout;
-
 @end
 
 @implementation TweetTableViewCell
@@ -146,7 +144,7 @@
                              ];
         }];
         
-        _layout = [MLLayout layoutWithTagView:self.contentView block:^(MLLayout * _Nonnull l) {
+        self.layoutOfContentView = [MLLayout layoutWithTagView:self.contentView block:^(MLLayout * _Nonnull l) {
             l.flexDirection = MLLayoutFlexDirectionRow;
             l.alignItems = MLLayoutAlignmentFlexStart;
             l.padding = UIEdgeInsetsMake(12, 12, 8, 12);
@@ -203,7 +201,7 @@
     [_detailImageView sd_setImageWithURL:tweet.detailImageURL placeholderImage:nil];
     
     //TODO: need to provide a method to make layout become invalid conveniently.
-    MLLayout *layoutOfDetailImageView = [_layout retrieveLayoutWithView:_detailImageView];
+    MLLayout *layoutOfDetailImageView = [self.layoutOfContentView retrieveLayoutWithView:_detailImageView];
     layoutOfDetailImageView.height = _detailImageView.hidden?0.0f:kDetailImageHeight;
     layoutOfDetailImageView.marginTop = _detailImageView.hidden?0.0f:5.0f;
     
@@ -212,21 +210,18 @@
     [attr appendAttributedString:nameAttr];
     _nameLabel.attributedText = attr;
     
-    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
-    formatter.dateFormat = @"M/d/yy";
-    [formatter setLocale:[NSLocale currentLocale]];
-    _timeLabel.text = [formatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:tweet.time]];
+    _timeLabel.text = tweet.time?:@"";
     
     _contentLabel.text = tweet.content;
     
-    [_retweetButton setTitle:tweet.retweetCount>0?[NSString stringWithFormat:@"%ld",tweet.retweetCount]:@"" forState:UIControlStateNormal];
-    [_favButton setTitle:tweet.favCount>0?[NSString stringWithFormat:@"%ld",tweet.favCount]:@"" forState:UIControlStateNormal];
+    [_retweetButton setTitle:tweet.retweetCount>0?[NSString stringWithFormat:@"%ld",(long)tweet.retweetCount]:@"" forState:UIControlStateNormal];
+    [_favButton setTitle:tweet.favCount>0?[NSString stringWithFormat:@"%ld",(long)tweet.favCount]:@"" forState:UIControlStateNormal];
     
     [self setNeedsLayout];
 }
 
 - (void)layoutSubviewsIfNoFrameRecord {
-    [_layout dirtyAllRelativeLayoutsAndLayoutViewsWithFrame:CGRectMake(0, 0, self.contentView.frame.size.width, kMLLayoutUndefined)];
+    [self.layoutOfContentView dirtyAllRelativeLayoutsAndLayoutViewsWithFrame:CGRectMake(0, 0, self.contentView.frame.size.width, kMLLayoutUndefined)];
     //    NSLog(@"\n\n%@\n\n",[_layout debugDescriptionWithMode:MLLayoutDebugModeViewLayoutFrame|MLLayoutDebugModeSublayout]);
 }
 

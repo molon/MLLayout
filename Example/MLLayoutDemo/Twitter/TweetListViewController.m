@@ -45,6 +45,11 @@
     NSString *path = [[NSBundle mainBundle] pathForResource:@"twitter" ofType:@"json"];
     NSData *data = [NSData dataWithContentsOfFile:path];
     NSArray *ts = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:NULL];
+    
+    NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
+    formatter.dateFormat = @"M/d/yy";
+    [formatter setLocale:[NSLocale currentLocale]];
+    
     for (NSDictionary *dict in ts) {
         //just for test
         Tweet *t = [Tweet new];
@@ -52,7 +57,7 @@
         t.nickname = dict[@"nickname"];
         t.avatarURL = [NSURL URLWithString:dict[@"avatarURL"]];
         t.content = dict[@"content"];
-        t.time = [dict[@"time"] doubleValue];
+        t.time = [formatter stringFromDate:[NSDate dateWithTimeIntervalSince1970:[dict[@"time"] doubleValue]]];
         t.favCount = [dict[@"favCount"] integerValue];
         t.retweetCount = [dict[@"retweetCount"] integerValue];
         t.detailImageURL = [NSURL URLWithString:dict[@"detailImageURL"]];
@@ -81,9 +86,20 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    return [TweetTableViewCell heightForRowAtIndexPath:indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:^(UITableViewCell * _Nonnull protypeCell) {
+    /*
+     The method only support for cells whose all subviews'frame can be determined with it's `layoutOfContentView` property.
+    */
+    return [TweetTableViewCell heightForRowUsingPureMLLayoutAtIndexPath:indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:^(UITableViewCell * _Nonnull protypeCell) {
         ((TweetTableViewCell*)protypeCell).tweet = _tweets[indexPath.row];
     }];
+    
+    /*
+     The method's performance is lower than `heightForRowUsingPureMLLayoutAtIndexPath:tableView:beforeLayout:`.
+     But it has no limit of method upon.
+    */
+//    return [TweetTableViewCell heightForRowAtIndexPath:indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:^(UITableViewCell * _Nonnull protypeCell) {
+//        ((TweetTableViewCell*)protypeCell).tweet = _tweets[indexPath.row];
+//    }];
 }
 
 @end

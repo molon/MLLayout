@@ -14,7 +14,7 @@
 @property (nonatomic, strong) NSURL *avatarURL;
 @property (nonatomic, copy) NSString *nickname;
 @property (nonatomic, copy) NSString *content;
-@property (nonatomic, assign) NSTimeInterval time;
+@property (nonatomic, copy) NSString *time;
 @property (nonatomic, assign) NSInteger retweetCount;
 @property (nonatomic, assign) NSInteger favCount;
 
