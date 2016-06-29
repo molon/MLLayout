@@ -3,7 +3,6 @@ MLLayout
 [![License MIT](https://img.shields.io/badge/license-MIT-green.svg?style=flat)](https://raw.githubusercontent.com/molon/MLLayout/master/LICENSE)&nbsp;
 [![CocoaPods](http://img.shields.io/cocoapods/v/MLLayout.svg?style=flat)](http://cocoapods.org/?q=MLLayout)&nbsp;
 [![CocoaPods](http://img.shields.io/cocoapods/p/MLLayout.svg?style=flat)](http://cocoapods.org/?q=MLLayout)&nbsp;
-[![Build Status](https://travis-ci.org/molon/MLLayout.svg?branch=master)](https://travis-ci.org/molon/MLLayout)&nbsp;
 
 Flexbox in Objective-C, using Facebook's css-layout.
 
@@ -17,7 +16,7 @@ Usage
 
 Simple demo below: 
 
-![SimpleViewController](https://raw.githubusercontent.com/molon/MLLayout/master/SimpleViewController.gif)
+![SimpleViewController](https://github.com/molon/MLLayout/blob/master/SimpleViewController.gif?raw=true)
 
 ```
 
@@ -70,7 +69,8 @@ _layout = [MLLayout layoutWithTagView:self.view block:^(MLLayout * _Nonnull l) {
 
 ```
 
-![TweetListViewController](https://raw.githubusercontent.com/molon/MLLayout/master/TweetListViewController.gif)
+![TweetListViewController](https://github.com/molon/MLLayout/blob/master/TweetListViewController.gif?raw=true)
+
 The demo uses `MLLayout` to layout subviews of cells and `MLTagViewFrameRecord` to record all layout result.
 
 Then we can ensure that never executed layout calculation twice, improve scrolling performance greatly. (Recording .gif with simulator, so the image fails to reflect the effect)
