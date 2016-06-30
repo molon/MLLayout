@@ -1,0 +1,10 @@
+language: objective-c
+osx_image: xcode7
+xcode_project: Example/MLLayoutDemo.xcworkspace
+xcode_scheme: MLLayoutDemo
+before_install:
+- brew update
+- brew upgrade xctool
+script:
+- xctool -project Example/MLLayoutDemo.xcworkspace -scheme MLLayoutDemo build CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+
