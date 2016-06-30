@@ -201,8 +201,7 @@ typedef NS_OPTIONS(NSUInteger, MLLayoutDebugMode) {
 /**
  Layout calculation and layouting views will ignores invalid MLLayout.
  */
-//TODO: Unimplemented
-@property (nonatomic, assign) BOOL invalid NS_UNAVAILABLE;
+@property (nonatomic, assign) BOOL invalid;
 
 #pragma mark - css style(flex)
 /**

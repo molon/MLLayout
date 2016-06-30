@@ -113,6 +113,10 @@ static inline BOOL isRectEqualToRect (CGRect r1,CGRect r2) {
 
 @property (nonatomic, assign) MLLayoutLifecycle layoutLifecycle;
 
+//Please dont access the property with _validSublayouts.
+//See -(NSArray*)validSublayouts
+@property (nonatomic, strong) NSArray<MLLayout*> *validSublayouts;
+
 - (css_node_t *)node;
 
 @end
@@ -129,7 +133,7 @@ static bool isDirty(void *context) {
 
 static css_node_t *getSubNode(void *context, int i) {
     MLLayout *self = (__bridge MLLayout *)context;
-    MLLayout *child = self.sublayouts[i];
+    MLLayout *child = self.validSublayouts[i];
     return [child node];
 }
 
@@ -226,6 +230,15 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
 }
 
 #pragma mark - helper
+- (void)fillChildrenCountForNode {
+    _node->children_count = (int)self.validSublayouts.count;
+}
+
+- (void)resetValidSublayouts {
+    _validSublayouts = nil;
+    [self fillChildrenCountForNode];
+}
+
 - (MLLayout*)retrieveDescendantWithView:(UIView*)view {
     MLLayout *resultLayout = nil;
     for (MLLayout *sublayout in _sublayouts) {
@@ -283,13 +296,13 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
     [self dirtyLayout];
     
     [((NSMutableArray*)_superlayout->_sublayouts) removeObject:self];
-    _superlayout->_node->children_count = (int)(_superlayout->_sublayouts.count);
+    [_superlayout resetValidSublayouts];
     _superlayout = nil;
 }
 
 - (void)insertSublayout:(MLLayout*)sublayout atIndex:(NSInteger)index {
     [((NSMutableArray*)_sublayouts) insertObject:sublayout atIndex:index];
-    _node->children_count = (int)_sublayouts.count;
+    [self resetValidSublayouts];
     sublayout->_superlayout = self;
     
     [sublayout dirtyLayout];
@@ -324,17 +337,22 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
 #pragma mark - debug description
 - (NSString*)debugDescriptionWithMode:(MLLayoutDebugMode)mode depth:(NSInteger)depth {
     NSMutableString *description = [NSMutableString stringWithFormat:@"%@(%ld):",_view?NSStringFromClass(_view.class):@"MLLayoutHelper",(long)_tag];
-    if (mode & MLLayoutDebugModeViewLayoutFrame) {
-        [description appendFormat:@" vframe=%@", NSStringFromCGRect(_frame)];
+    if (_invalid) {
+        [description insertString:@"Invalid->" atIndex:0];
     }
-    if (mode & MLLayoutDebugModeOriginalLayoutFrame) {
-        [description appendFormat:@" lframe=%@", NSStringFromCGRect([self layoutFrame])];
+    if (!_invalid) {
+        if (mode & MLLayoutDebugModeViewLayoutFrame) {
+            [description appendFormat:@" vframe=%@", NSStringFromCGRect(_frame)];
+        }
+        if (mode & MLLayoutDebugModeOriginalLayoutFrame) {
+            [description appendFormat:@" lframe=%@", NSStringFromCGRect([self layoutFrame])];
+        }
     }
     if (mode & MLLayoutDebugModeStyle) {
         [description appendFormat:@" style={%@}",self.style];
     }
     if (_sublayouts.count > 0) {
-        if (mode & MLLayoutDebugModeSublayout) {
+        if ((mode & MLLayoutDebugModeSublayout)&&!_invalid) {
             NSMutableString *indent = [NSMutableString string];
             for (NSInteger i = 0; i < depth+1; i++) {
                 [indent appendFormat:@"\t"];
@@ -348,6 +366,9 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
             [description appendFormat:@" sublayouts:%lu",(unsigned long)_sublayouts.count];
         }
     }
+    if ([description hasSuffix:@":"]) {
+        [description deleteCharactersInRange:NSMakeRange(description.length-1, 1)];
+    }
     return description;
 }
 
@@ -358,6 +379,7 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
 #pragma mark - layout
 - (NSMutableSet<MLLayout *> *)updatedLayoutsAfterLayoutCalculationWithFrame:(CGRect)frame {
     NSAssert(_superlayout==nil, @"`updatedLayoutsAfterLayoutCalculationWithFrame:` method only support for root layout");
+    NSAssert(!_invalid, @"`updatedLayoutsAfterLayoutCalculationWithFrame:` method doesnt support for invalid layout!");
     
     //round pixel
     frame = roundPixelRect(frame);
@@ -462,14 +484,16 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
     
     //if _view is nil, pass orgin to sublayouts
     layoutHelperOffset = !_view?frame.origin:CGPointZero;
-    for (MLLayout *sublayout in _sublayouts) {
+    for (MLLayout *sublayout in self.validSublayouts) {
         [sublayout applyLayoutWithUpdatedLayouts:updatedLayoutsWithNewFrame layoutHelperOffset:layoutHelperOffset absolutePosition:absolutePosition];
     }
 }
 
 - (void)layoutViewsWithUpdatedLayouts:(NSMutableSet<MLLayout *> *)updatedLayouts {
     for (MLLayout *layout in updatedLayouts) {
-        layout->_view.frame = layout->_frame;
+        if (!layout->_invalid) {
+            layout->_view.frame = layout->_frame;
+        }
     }
 }
 
@@ -492,6 +516,21 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
     return _measure||[_view respondsToSelector:@selector(measureWithMLLayout:width:widthMode:height:heightMode:)];
 }
 
+- (NSArray<MLLayout*>*)validSublayouts {
+    if (_validSublayouts) {
+        return _validSublayouts;
+    }
+    
+    NSMutableArray<MLLayout*> *subs = [NSMutableArray array];
+    for (MLLayout *sublayout in _sublayouts) {
+        if (!sublayout.invalid) {
+            [subs addObject:sublayout];
+        }
+    }
+    _validSublayouts = subs;
+    return subs;
+}
+
 //- (MLLayout*)rootLayout {
 //    MLLayout *superlayout = self;
 //    while (superlayout->_superlayout) {
@@ -500,7 +539,7 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
 //    return superlayout;
 //}
 
-// the original frame after layout without treating with layout helper offset,see `applyLayoutWithUpdatedLayouts:layoutHelperOffset:`
+// the original frame after layout calculation without treating with layout helper offset,see `applyLayoutWithUpdatedLayouts:layoutHelperOffset:`
 - (CGRect)layoutFrame {
     return (CGRect){{
         _node->layout.position[CSS_LEFT],
@@ -657,7 +696,8 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
     return [self debugDescriptionWithMode:MLLayoutDebugModeViewLayoutFrame|MLLayoutDebugModeOriginalLayoutFrame|MLLayoutDebugModeStyle];
 }
 
-#pragma mark - css getter and setter
+#pragma mark - setter
+
 - (void)setView:(UIView *)view {
     NSAssert(view.tag!=kMLLayoutInvalidTag, @"\n\n`setView:`\nTag of view:\n---------\n%@\n--------\nmust be not -1.\n\n",view);
     
@@ -676,9 +716,9 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
         } forLayout:self];
     }
     //`view` is readonly, the last view tag is always valid, dont need to reset to invalid
-//    else{
-//        _tag = kMLLayoutInvalidTag;
-//    }
+    //    else{
+    //        _tag = kMLLayoutInvalidTag;
+    //    }
     
     _node->measure = [self hasMeasure]?measureNode:NULL;
     
@@ -721,12 +761,13 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
     views = nil;
 #endif
     _sublayouts = [sublayouts mutableCopy];
-    _node->children_count = (int)_sublayouts.count;
     for (MLLayout *sublayout in _sublayouts) {
         sublayout->_superlayout = self;
         //dirty directly
         sublayout->_layoutLifecycle = MLLayoutLifecycleDirtied;
     }
+    
+    [self resetValidSublayouts];
     
     [self dirtyLayout];
 }
@@ -734,8 +775,12 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
 - (void)setInvalid:(BOOL)invalid {
     _invalid = invalid;
     
+    [_superlayout resetValidSublayouts];
+    
     [self dirtyLayout];
 }
+
+#pragma mark - css getter and setter
 
 #define ARRAY_FLOAT_PROPERTY(styleProp, setProp, getProp, cssProp) \
 - (void)set##setProp:(CGFloat)value { \
@@ -849,7 +894,7 @@ CSS_PROPERTY(flex, Flex, flex, CGFloat, float)
             sublayout->_superlayout = layout;
         }
     }
-    layout->_node->children_count = (int)layout->_sublayouts.count;
+    [layout resetValidSublayouts];
     layout->_layoutLifecycle = _layoutLifecycle;
     
     return layout;

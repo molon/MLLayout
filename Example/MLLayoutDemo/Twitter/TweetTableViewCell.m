@@ -88,7 +88,7 @@
             [self.contentView addSubview:imageView];
             imageView;
         });
-
+        
         
         UIButton *(^buttonBlock)(NSString *imageName) = ^(NSString *imageName) {
             UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -197,13 +197,19 @@
         });
     }];
     
-    _detailImageView.hidden = tweet.detailImageURL==nil;
     [_detailImageView sd_setImageWithURL:tweet.detailImageURL placeholderImage:nil];
     
-    //TODO: need to provide a method to make layout become invalid conveniently.
-    MLLayout *layoutOfDetailImageView = [self.layoutOfContentView retrieveLayoutWithView:_detailImageView];
-    layoutOfDetailImageView.height = _detailImageView.hidden?0.0f:kDetailImageHeight;
-    layoutOfDetailImageView.marginTop = _detailImageView.hidden?0.0f:5.0f;
+    {
+        _detailImageView.hidden = tweet.detailImageURL==nil;
+        
+        //Invalidate a layout temporarily
+        [self.layoutOfContentView retrieveLayoutWithView:_detailImageView].invalid = _detailImageView.hidden;
+        
+        //A long-winded implementation
+        //    MLLayout *layoutOfDetailImageView = [self.layoutOfContentView retrieveLayoutWithView:_detailImageView];
+        //    layoutOfDetailImageView.height = _detailImageView.hidden?0.0f:kDetailImageHeight;
+        //    layoutOfDetailImageView.marginTop = _detailImageView.hidden?0.0f:5.0f;
+    }
     
     NSMutableAttributedString *attr = [[NSMutableAttributedString alloc]initWithString:tweet.nickname];
     NSAttributedString *nameAttr = [[NSAttributedString alloc]initWithString:[NSString stringWithFormat:@" @%@",tweet.name] attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:12.0f],NSForegroundColorAttributeName:[UIColor colorWithRed:0.482 green:0.549 blue:0.608 alpha:1.000]}];

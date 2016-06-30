@@ -132,16 +132,24 @@
 
 @end
 
+@interface MLLayout(Private)
+
+@property (nonatomic, strong) NSArray<MLLayout*> *validSublayouts;
+
+@end
+
 @implementation MLLayout (MLTagViewFrameRecord)
 
 - (MLTagViewFrameRecord*)exportTagViewFrameRecord {
+    NSAssert(!self.invalid, @"`exportTagViewFrameRecord:` method doesnt support for invalid layout!");
+    
     MLTagViewFrameRecord *record = [MLTagViewFrameRecord new];
     record.tag = self.tag;
     record.frame = self.frame;
     
-    if (self.sublayouts) {
-        NSMutableArray *subrecords = [NSMutableArray arrayWithCapacity:self.sublayouts.count];
-        for (MLLayout *sublayout in self.sublayouts) {
+    if (self.validSublayouts) {
+        NSMutableArray *subrecords = [NSMutableArray arrayWithCapacity:self.validSublayouts.count];
+        for (MLLayout *sublayout in self.validSublayouts) {
             [subrecords addObject:[sublayout exportTagViewFrameRecord]];
         }
         record.subrecords = subrecords;
