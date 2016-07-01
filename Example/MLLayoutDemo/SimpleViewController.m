@@ -95,6 +95,23 @@
     displaySwitchButton.tag = tag++;
     [self.view addSubview:displaySwitchButton];
     
+    MLLayout *bkgViewLayout = [MLLayout layoutWithTagView:_bkgView block:^(MLLayout * _Nonnull l) {
+        l.marginLeft = l.marginRight = 10.0f;
+        //test for round pixel
+        l.padding = UIEdgeInsetsMake(10.34f, 15.37f, 10.5608f, 15.3567f);
+        
+        l.flexDirection = MLLayoutFlexDirectionColumn;
+        l.alignItems = MLLayoutAlignmentCenter;
+        l.alignSelf = MLLayoutAlignmentCenter;
+        l.sublayouts = @[
+                         [MLLayout layoutWithTagView:_firstLabel block:nil],
+                         [MLLayout layoutWithTagView:_secondLabel block:^(MLLayout * _Nonnull l) {
+                             l.marginTop = 10.0f; //space
+                             l.flex = -1;
+                         }],
+                         ];
+    }];
+    
     _layout = [MLLayout layoutWithTagView:self.view block:^(MLLayout * _Nonnull l) {
         l.flexDirection = MLLayoutFlexDirectionColumn;
         l.justifyContent = MLLayoutJustifyContentCenter;
@@ -119,26 +136,7 @@
                              l.position = MLLayoutPositionRelative;
                              l.bottom = 10.0f;
                          }],
-                         [MLLayout layoutWithTagView:_bkgView block:^(MLLayout * _Nonnull l) {
-                             l.marginLeft = l.marginRight = 10.0f;
-                             //test for round pixel
-                             l.padding = UIEdgeInsetsMake(10.34f, 15.37f, 10.5608f, 15.3567f);
-                             
-                             l.flexDirection = MLLayoutFlexDirectionColumn;
-                             l.alignItems = MLLayoutAlignmentCenter;
-                             l.alignSelf = MLLayoutAlignmentCenter;
-                             l.sublayouts = @[
-                                              [MLLayout layoutWithTagView:_firstLabel block:nil],
-                                              //placeholder(nil view) as sapce
-                                              //                                              [MLLayout layoutWithTagView:nil block:^(MLLayout * _Nonnull l) {
-                                              //                                                  l.height = 10.0f;
-                                              //                                              }],
-                                              [MLLayout layoutWithTagView:_secondLabel block:^(MLLayout * _Nonnull l) {
-                                                  l.marginTop = 10.0f; //space
-                                                  l.flex = -1;
-                                              }],
-                                              ];
-                         }],
+                         bkgViewLayout
                          ];
     }];
 }
