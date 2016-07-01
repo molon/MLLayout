@@ -10,11 +10,11 @@ Flexbox in Objective-C, using Facebook's css-layout.
 Inspired by [React Native](https://github.com/facebook/react-native).
 
 - Flexbox is the best way to layout in mobile platform. So many popular libriries use it, eg: [componentkit](https://github.com/facebook/componentkit), [AsyncDisplayKit](https://github.com/facebook/AsyncDisplayKit), [React Native](https://github.com/facebook/react-native), [weex](https://github.com/alibaba/weex) and so on.
-- `React Native` `weex` and `MLLayout` are base on the C implementation of [facebook/css-layout](https://github.com/facebook/css-layout).
-- Some code reference from `React Native`, eg: snapping to the pixel grid(No misaligned images to improve drawing performance]).
+- [React Native](https://github.com/facebook/react-native) [weex](https://github.com/alibaba/weex) and `MLLayout` are based on the C implementation of [facebook/css-layout](https://github.com/facebook/css-layout).
+- Some code references from [React Native](https://github.com/facebook/react-native), eg: snapping to the pixel grid(No misaligned images to improve drawing performance]).
 - `MLLayout` can be just used for layout calculation. The calculation will update frames of layouts. Every layout associated with a view usually. You may or may choose not to use the frames or change them. with your mind.
-- `MLTagViewFrameRecord` can preserves current topology of layouts or views. A prerequisite is that each has a valid tag.
-- Using `MLTagViewFrameRecord` related TableView and TableViewCell can ensure that the layout calculation for one row would not be excuted twice unless explicitly. The feather can improve scrolling performance greatly.
+- `MLTagViewFrameRecord` can preserve current topology of layouts or views. A prerequisite is that each has a valid tag.
+- Using `MLTagViewFrameRecord` related TableView and TableViewCell can ensure that the layout calculation for one row would not be excuted twice unless reloading it explicitly. The feather can improve scrolling performance greatly.
 
 `FlexBox Guide`: [https://css-tricks.com/snippets/css/a-guide-to-flexbox/](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
 
@@ -87,7 +87,7 @@ MLLayout *bkgViewLayout = [MLLayout layoutWithTagView:_bkgView block:^(MLLayout 
 
 ![TweetListViewController](https://github.com/molon/MLLayout/blob/master/TweetListViewController.gif?raw=true)
 
-The demo uses `MLLayout` to layout subviews of cells and `MLTagViewFrameRecord` to preserve all layout result. Ensure that the layout calculation for one row would not be excuted twice unless explicitly. The feather can improve scrolling performance greatly.
+The demo uses `MLLayout` to layout subviews of cells and `MLTagViewFrameRecord` to preserve all layout result. Ensure that the layout calculation for one row would not be excuted twice unless reloading it explicitly. The feather can improve scrolling performance greatly.
 
 
 Installation
