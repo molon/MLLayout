@@ -13,15 +13,30 @@ Usage
 ==============
 `FlexBox Guide`: [https://css-tricks.com/snippets/css/a-guide-to-flexbox/](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
 
-`Chinese FlexBox Guide`: [http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html?utm_source=tuicool](http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html?utm_source=tuicool)
-
 Simple demo below: 
 
 ![SimpleViewController](https://github.com/molon/MLLayout/blob/master/SimpleViewController.gif?raw=true)
 
 ```
 
-_layout = [MLLayout layoutWithTagView:self.view block:^(MLLayout * _Nonnull l) {
+MLLayout *bkgViewLayout = [MLLayout layoutWithTagView:_bkgView block:^(MLLayout * _Nonnull l) {
+        l.marginLeft = l.marginRight = 10.0f;
+        //test for round pixel
+        l.padding = UIEdgeInsetsMake(10.34f, 15.37f, 10.5608f, 15.3567f);
+        
+        l.flexDirection = MLLayoutFlexDirectionColumn;
+        l.alignItems = MLLayoutAlignmentCenter;
+        l.alignSelf = MLLayoutAlignmentCenter;
+        l.sublayouts = @[
+                         [MLLayout layoutWithTagView:_firstLabel block:nil],
+                         [MLLayout layoutWithTagView:_secondLabel block:^(MLLayout * _Nonnull l) {
+                             l.marginTop = 10.0f; //space
+                             l.flex = -1;
+                         }],
+                         ];
+    }];
+    
+    _layout = [MLLayout layoutWithTagView:self.view block:^(MLLayout * _Nonnull l) {
         l.flexDirection = MLLayoutFlexDirectionColumn;
         l.justifyContent = MLLayoutJustifyContentCenter;
         l.alignItems = MLLayoutAlignmentCenter;
@@ -45,29 +60,10 @@ _layout = [MLLayout layoutWithTagView:self.view block:^(MLLayout * _Nonnull l) {
                              l.position = MLLayoutPositionRelative;
                              l.bottom = 10.0f;
                          }],
-                         [MLLayout layoutWithTagView:_bkgView block:^(MLLayout * _Nonnull l) {
-                             l.marginLeft = l.marginRight = 10.0f;
-                             //test for round pixel
-                             l.padding = UIEdgeInsetsMake(10.34f, 15.37f, 10.5608f, 15.3567f);
-                             
-                             l.flexDirection = MLLayoutFlexDirectionColumn;
-                             l.alignItems = MLLayoutAlignmentCenter;
-                             l.alignSelf = MLLayoutAlignmentCenter;
-                             l.sublayouts = @[
-                                              [MLLayout layoutWithTagView:_firstLabel block:nil],
-                                              //placeholder(nil view) as sapce
-                                              //                                              [MLLayout layoutWithTagView:nil block:^(MLLayout * _Nonnull l) {
-                                              //                                                  l.height = 10.0f;
-                                              //                                              }],
-                                              [MLLayout layoutWithTagView:_secondLabel block:^(MLLayout * _Nonnull l) {
-                                                  l.marginTop = 10.0f; //space
-                                                  l.flex = -1;
-                                              }],
-                                              ];
-                         }],
+                         bkgViewLayout
                          ];
     }];
-
+    
 ```
 
 ![TweetListViewController](https://github.com/molon/MLLayout/blob/master/TweetListViewController.gif?raw=true)
@@ -95,4 +91,19 @@ This library requires `iOS 7.0+` and `Xcode 7.0+`.
 License
 ==============
 MLLayout is provided under the MIT license. See LICENSE file for details.
+
+<br/><br/>
+---
+中文介绍
+==============
+- Flexbox是现今移动端最优的布局方式，像[componentkit](https://github.com/facebook/componentkit), [AsyncDisplayKit](https://github.com/facebook/AsyncDisplayKit), [React Native](https://github.com/facebook/react-native), [weex](https://github.com/alibaba/weex)等等优秀的开源库都在使用此种布局方式。
+- `React Native`和`weex`以及`MLLayout`都一样是基于facebook开源[css-layout](https://github.com/facebook/css-layout)的c实现。
+- `MLLayout`的一些代码实现是借鉴于`React Native`，例如布局计算结果进行默认像素对齐，提升渲染性能。
+- 对以往纯代码布局的开发者而言，`MLLayout`也可以作为仅仅用来以语义化的形式快速计算布局结果的工具，像对关键的view的frame进行设置，再次调整啊这些都可以自己来做，也可以通过提供的方法自动设置。
+- `MLTagViewFrameRecord`相关的TableView和TableViewCell呢，也提供了自动缓存cell布局(当然顺带也有高度啦)的实现，这样的话能保证同一行的布局只会计算一次，除非显式reload。这个能大大的提高列表的滚动性能，但是前提得是需要缓存frame的view需要有独特的tag。
+
+其他内容之后有空再补充吧。
+
+
+
 
