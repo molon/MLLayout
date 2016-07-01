@@ -9,17 +9,28 @@ Flexbox in Objective-C, using Facebook's css-layout.
 
 Inspired by [React Native](https://github.com/facebook/react-native).
 
+- Flexbox is the best way to layout in mobile platform. So many popular libriries use it, eg: [componentkit](https://github.com/facebook/componentkit), [AsyncDisplayKit](https://github.com/facebook/AsyncDisplayKit), [React Native](https://github.com/facebook/react-native), [weex](https://github.com/alibaba/weex) and so on.
+- `React Native` `weex` and `MLLayout` are base on the C implementation of [facebook/css-layout](https://github.com/facebook/css-layout).
+- Some code reference from `React Native`, eg: snapping to the pixel grid(No misaligned images to improve drawing performance]).
+- `MLLayout` can be just used for layout calculation. The calculation will update frames of layouts. Every layout associated with a view usually. You may or may choose not to use the frames or change them. with your mind.
+- `MLTagViewFrameRecord` can preserves current topology of layouts or views. A prerequisite is that each has a valid tag.
+- Using `MLTagViewFrameRecord` related TableView and TableViewCell can ensure that the layout calculation for one row would not be excuted twice unless explicitly. The feather can improve scrolling performance greatly.
+
+`FlexBox Guide`: [https://css-tricks.com/snippets/css/a-guide-to-flexbox/](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
+
 ##中文介绍
 
 - Flexbox是现今移动端最优的布局方式，像[componentkit](https://github.com/facebook/componentkit), [AsyncDisplayKit](https://github.com/facebook/AsyncDisplayKit), [React Native](https://github.com/facebook/react-native), [weex](https://github.com/alibaba/weex)等等优秀的开源库都在使用此种布局方式。
-- `React Native`和`weex`以及`MLLayout`都一样是基于facebook开源[css-layout](https://github.com/facebook/css-layout)的c实现。
+- `React Native`和`weex`以及`MLLayout`都一样是基于facebook开源[facebook/css-layout](https://github.com/facebook/css-layout)的c实现。
 - `MLLayout`的一些代码实现是借鉴于`React Native`，例如布局计算结果进行默认像素对齐，提升渲染性能。
 - 对以往纯代码布局的开发者而言，`MLLayout`也可以作为仅仅用来以语义化的形式快速计算布局结果的工具，像对关联的view的frame进行设置，再次调整啊这些都可以自己来做，也可以通过提供的方法自动设置。
-- `MLTagViewFrameRecord`相关的TableView和TableViewCell呢，也提供了自动缓存cell布局(当然顺带也有高度啦)的实现，这样的话能保证同一行的布局只会计算一次，除非显式reload。这个能大大的提高列表的滚动性能，但是前提得是需要缓存frame的view需要有独特的tag。
+- `MLTagViewFrameRecord`可以记录当前的布局结构，但是前提是需要缓存frame的view需要有独特的tag用以之后将记录应用到对应的view上。
+- `MLTagViewFrameRecord`相关的TableView和TableViewCell呢，提供了自动缓存cell布局(当然顺带也有高度啦)的实现，这样的话能保证同一行的布局只会计算一次，除非显式reload。这个能大大的提高列表的滚动性能。
+
+`FlexBox教程`: [http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html?utm_source=tuicool](http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html?utm_source=tuicool)
 
 Usage
 ==============
-`FlexBox Guide`: [https://css-tricks.com/snippets/css/a-guide-to-flexbox/](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
 
 Simple demo below: 
 
@@ -76,9 +87,7 @@ MLLayout *bkgViewLayout = [MLLayout layoutWithTagView:_bkgView block:^(MLLayout 
 
 ![TweetListViewController](https://github.com/molon/MLLayout/blob/master/TweetListViewController.gif?raw=true)
 
-The demo uses `MLLayout` to layout subviews of cells and `MLTagViewFrameRecord` to record all layout result.
-
-Then we can ensure that never executed layout calculation twice, improve scrolling performance greatly. (Recording .gif with simulator, so the image fails to reflect the effect)
+The demo uses `MLLayout` to layout subviews of cells and `MLTagViewFrameRecord` to preserve all layout result. Ensure that the layout calculation for one row would not be excuted twice unless explicitly. The feather can improve scrolling performance greatly.
 
 
 Installation
