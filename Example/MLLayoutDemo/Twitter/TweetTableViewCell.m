@@ -227,7 +227,7 @@
 }
 
 - (void)layoutSubviewsIfNoFrameRecord {
-    [self.layoutOfContentView dirtyAllRelativeLayoutsAndLayoutViewsWithFrame:CGRectMake(0, 0, self.contentView.frame.size.width, kMLLayoutUndefined)];
+    [self.layoutOfContentView dirtyAllRelatedLayoutsAndLayoutViewsWithFrame:CGRectMake(0, 0, self.contentView.frame.size.width, kMLLayoutUndefined)];
     //    NSLog(@"\n\n%@\n\n",[_layout debugDescriptionWithMode:MLLayoutDebugModeViewLayoutFrame|MLLayoutDebugModeSublayout]);
 }
 

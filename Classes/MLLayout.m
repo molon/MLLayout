@@ -220,7 +220,7 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
     }
 }
 
-- (void)dirtyAllRelativeLayouts {
+- (void)dirtyAllRelatedLayouts {
     [self dirtyLayout];
     [self dirtyDescendants];
 }
@@ -501,8 +501,8 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
     [self layoutViewsWithUpdatedLayouts:[self updatedLayoutsAfterLayoutCalculationWithFrame:frame]];
 }
 
-- (void)dirtyAllRelativeLayoutsAndLayoutViewsWithFrame:(CGRect)frame {
-    [self dirtyAllRelativeLayouts];
+- (void)dirtyAllRelatedLayoutsAndLayoutViewsWithFrame:(CGRect)frame {
+    [self dirtyAllRelatedLayouts];
     [self layoutViewsWithFrame:frame];
 }
 

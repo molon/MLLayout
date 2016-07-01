@@ -122,7 +122,7 @@ static inline MLAutoRecordFrameTableViewCell *kProtypeAutoRecordFrameTableViewCe
         beforeLayout(protypeCell);
     }
     
-    [protypeCell.layoutOfContentView dirtyAllRelativeLayouts];
+    [protypeCell.layoutOfContentView dirtyAllRelatedLayouts];
     [protypeCell.layoutOfContentView updatedLayoutsAfterLayoutCalculationWithFrame:CGRectMake(0, 0, tableView.frame.size.width, kMLLayoutUndefined)];
     
     //cache

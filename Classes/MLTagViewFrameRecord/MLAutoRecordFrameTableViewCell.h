@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  Example:
  - (void)layoutSubviewsIfNoFrameRecord {
-    [_layout dirtyAllRelativeLayoutsAndLayoutViewsWithFrame:CGRectMake(0, 0, self.contentView.frame.size.width, kMLLayoutUndefined)]; //kMLLayoutUndefined is important if using MLLayout because of warning 2 upon.
+    [_layout dirtyAllRelatedLayoutsAndLayoutViewsWithFrame:CGRectMake(0, 0, self.contentView.frame.size.width, kMLLayoutUndefined)]; //kMLLayoutUndefined is important if using MLLayout because of warning 2 upon.
  }
  */
 - (void)layoutSubviewsIfNoFrameRecord;

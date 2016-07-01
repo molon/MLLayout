@@ -146,7 +146,8 @@ typedef NS_OPTIONS(NSUInteger, MLLayoutDebugMode) {
      */
     MLLayoutDebugModeViewLayoutFrame      = 1 << 0,
     /**
-     contains original layout frame before treat with layout helper offset
+     contains original layout frame before appying offset of layout helpers
+     (layout.view==nil indicates it's a layout helper)
      */
     MLLayoutDebugModeOriginalLayoutFrame  = 1 << 1,
     /**
@@ -267,8 +268,17 @@ typedef NS_OPTIONS(NSUInteger, MLLayoutDebugMode) {
  default: 0
  */
 @property (nonatomic, assign) CGFloat marginTop;
+/**
+ default: 0
+ */
 @property (nonatomic, assign) CGFloat marginLeft;
+/**
+ default: 0
+ */
 @property (nonatomic, assign) CGFloat marginBottom;
+/**
+ default: 0
+ */
 @property (nonatomic, assign) CGFloat marginRight;
 
 /**
@@ -290,8 +300,17 @@ typedef NS_OPTIONS(NSUInteger, MLLayoutDebugMode) {
  default: 0
  */
 @property (nonatomic, assign) CGFloat paddingTop;
+/**
+ default: 0
+ */
 @property (nonatomic, assign) CGFloat paddingLeft;
+/**
+ default: 0
+ */
 @property (nonatomic, assign) CGFloat paddingBottom;
+/**
+ default: 0
+ */
 @property (nonatomic, assign) CGFloat paddingRight;
 
 /**
@@ -360,7 +379,7 @@ typedef NS_OPTIONS(NSUInteger, MLLayoutDebugMode) {
 /**
  create layout with associated view which has a valid tag, if view is nil, just returns a layout helper.
  
- @param tagView  view which has a valid tag
+ @param tagView  view which has a valid tag, not 0/-1
  @param block block to set property conveniently
  
  @return instance
@@ -368,7 +387,7 @@ typedef NS_OPTIONS(NSUInteger, MLLayoutDebugMode) {
 + (instancetype)layoutWithTagView:(nullable UIView*)tagView block:(nullable void (^)(MLLayout *l))block;
 
 /**
- some peoperties is readonly ,like `view`
+ because some peoperties is readonly ,like `view`
  
  @return instance
  */
@@ -389,9 +408,9 @@ typedef NS_OPTIONS(NSUInteger, MLLayoutDebugMode) {
 - (void)dirtyLayout;
 
 /**
- dirty all relative layouts, ancestors and self and descendants
+ dirty all related layouts, ancestors and self and descendants
  */
-- (void)dirtyAllRelativeLayouts;
+- (void)dirtyAllRelatedLayouts;
 
 /**
  dirty layout and ancestors with its view
@@ -402,11 +421,11 @@ typedef NS_OPTIONS(NSUInteger, MLLayoutDebugMode) {
 
 #pragma mark - helper
 /**
- get the relative layout of view
+ get the associated layout of view
  
  @param view associated view
  
- @return relative layout
+ @return associated layout
  */
 - (MLLayout*)retrieveLayoutWithView:(UIView*)view;
 
@@ -459,7 +478,7 @@ typedef NS_OPTIONS(NSUInteger, MLLayoutDebugMode) {
 #pragma mark - layout
 
 /**
- Calculate layouts with frame and return updated layouts
+ Calculate layouts to fit frame and return updated layouts
  
  @param frame frame
  
@@ -468,14 +487,14 @@ typedef NS_OPTIONS(NSUInteger, MLLayoutDebugMode) {
 - (nullable NSMutableSet<MLLayout *> *)updatedLayoutsAfterLayoutCalculationWithFrame:(CGRect)frame;
 
 /**
- apply frames to views with it's layout'frame
+ apply frames to views with layouts
  
  @param updatedLayouts updatedLayouts
  */
 - (void)layoutViewsWithUpdatedLayouts:(nullable NSMutableSet<MLLayout *> *)updatedLayouts;
 
 /**
- Calculate layouts with frame and apply frames to views
+ Calculate layouts to fit frame and apply frames to views
  @note same with `[self layoutViewsWithUpdatedLayouts:[self updatedLayoutsAfterLayoutCalculationWithFrame]];`
  
  @param frame frame
@@ -485,12 +504,12 @@ typedef NS_OPTIONS(NSUInteger, MLLayoutDebugMode) {
 
 /**
  same with
- [self dirtyAllRelativeLayouts];
+ [self dirtyAllRelatedLayouts];
  [self layoutViewsWithFrame:frame];
  
  @param frame frame
  */
-- (void)dirtyAllRelativeLayoutsAndLayoutViewsWithFrame:(CGRect)frame;
+- (void)dirtyAllRelatedLayoutsAndLayoutViewsWithFrame:(CGRect)frame;
 
 @end
 
