@@ -104,10 +104,33 @@
         l.alignItems = MLLayoutAlignmentCenter;
         l.alignSelf = MLLayoutAlignmentCenter;
         l.sublayouts = @[
+#warning Please do not doubt that why this label didn't need to be provided a measure block, because UILabel has a common measure method. see: UILabel+MLLayout.m
                          [MLLayout layoutWithTagView:_firstLabel block:nil],
                          [MLLayout layoutWithTagView:_secondLabel block:^(MLLayout * _Nonnull l) {
                              l.marginTop = 10.0f; //space
                              l.flex = -1;
+                             
+#warning !!!!!!!!This is our test below!!!!!!!!!
+                             l.maxWidth = 200;
+                             [l setMeasure:^CGSize(MLLayout * _Nonnull l, CGFloat width, MLLayoutMeasureMode widthMode, CGFloat height, MLLayoutMeasureMode heightMode) {
+                                 CGSize size = CGSizeMake(HUGE, HUGE);
+                                 
+                                 if (!isnan(width)) {
+                                     size.width = width;
+                                 }
+                                 
+                                 if (!isnan(height)) {
+                                     size.height = height;
+                                 }
+                                 
+#warning If not fix the size with min/max dimensions, the constraint size may be incorrect, so we will get a useless result. 
+#warning So I dont think the clamp behavior should be done here. maybe css-layout can tell users the constraint size after clamping when it call the measure block.
+//                                 size.width = dimensionClamp(l.minWidth,l.maxWidth,size.width);
+//                                 size.height = dimensionClamp(l.minHeight,l.maxHeight,size.height);
+                                 
+                                 size = [l.view sizeThatFits:size];
+                                 return size;
+                             }];
                          }],
                          ];
     }];
