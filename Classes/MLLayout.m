@@ -62,7 +62,7 @@ static inline void setLayoutFrameRecord(css_node_t *node,style_frame_record_t *r
 }
 
 static inline CGFloat screenScale() {
-    static CGFloat screenScale = 0.0;
+    static CGFloat screenScale = 0.0f;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         if ([NSThread isMainThread]) {

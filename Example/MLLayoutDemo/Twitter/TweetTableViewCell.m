@@ -181,10 +181,9 @@
     __weak __typeof(self)wself = self;
     [_avatarImageView sd_setImageWithURL:tweet.avatarURL placeholderImage:nil options:SDWebImageAvoidAutoSetImage completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
         __block UIImage *result = image;
-        CGFloat lineWeight = wself.avatarImageView.layer.borderWidth;
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             result = [image imageByResizeToSize:CGSizeMake(kImageSide, kImageSide) contentMode:UIViewContentModeScaleAspectFill];
-            result = [result imageByRoundCornerRadius:kImageCornerRadius corners:UIRectCornerAllCorners borderWidth:lineWeight];
+            result = [result imageByRoundCornerRadius:kImageCornerRadius];
             
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (![imageURL isEqual:wself.avatarImageView.sd_imageURL]) {
