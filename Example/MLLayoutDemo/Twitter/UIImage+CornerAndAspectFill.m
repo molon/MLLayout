@@ -8,33 +8,28 @@
 
 #import "UIImage+CornerAndAspectFill.h"
 
+static CGFloat ____screenScaleForCornerAndAspectFill = 0.0f;
+
+@implementation UIScreen (CornerAndAspectFill)
+
++ (void)load {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        ____screenScaleForCornerAndAspectFill = [UIScreen mainScreen].scale;
+    });
+}
+
++ (CGFloat)screenScale {
+    return ____screenScaleForCornerAndAspectFill;
+}
+
+@end
+
+#define kScreenScale [UIScreen screenScale]
+
 @implementation UIImage (CornerAndAspectFill)
 
-#pragma mark - corner
-- (UIImage *)imageByRoundCornerRadius:(CGFloat)radius
-{
-    return [self imageByRoundCornerRadius:radius corners:UIRectCornerAllCorners borderWidth:0];
-}
 
-- (UIImage *)imageByRoundCornerRadius:(CGFloat)radius corners:(UIRectCorner)corners borderWidth:(CGFloat)borderWidth
-{
-    UIGraphicsBeginImageContextWithOptions(self.size, NO, 0);
-    CGContextRef context = UIGraphicsGetCurrentContext();
-    CGRect rect = CGRectMake(0, 0, self.size.width, self.size.height);
-    CGContextScaleCTM(context, 1, -1);
-    CGContextTranslateCTM(context, 0, -rect.size.height);
-    
-    CGFloat minSize = MIN(self.size.width, self.size.height);
-    if (borderWidth < minSize / 2) {
-        [[UIBezierPath bezierPathWithRoundedRect:CGRectInset(rect, borderWidth, borderWidth) byRoundingCorners:corners cornerRadii:CGSizeMake(radius, borderWidth)] addClip];
-        CGContextDrawImage(context, rect, self.CGImage);
-    }
-    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    return image;
-}
-
-#pragma mark - crop
 CGRect YYCGRectFitWithContentMode(CGRect rect, CGSize size, UIViewContentMode mode) {
     rect = CGRectStandardize(rect);
     size.width = size.width < 0 ? -size.width : size.width;
@@ -132,12 +127,80 @@ CGRect YYCGRectFitWithContentMode(CGRect rect, CGSize size, UIViewContentMode mo
     }
 }
 
+- (UIImage *)imageByResizeToSize:(CGSize)size {
+    if (size.width <= 0 || size.height <= 0) return nil;
+    CGFloat scaleRatio = kScreenScale/self.scale;
+    size.width = size.width*scaleRatio;
+    size.height = size.height*scaleRatio;
+    
+    UIGraphicsBeginImageContextWithOptions(size, NO, self.scale);
+    [self drawInRect:CGRectMake(0, 0, size.width, size.height)];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
+}
+
 - (UIImage *)imageByResizeToSize:(CGSize)size contentMode:(UIViewContentMode)contentMode {
     if (size.width <= 0 || size.height <= 0) return nil;
-    UIGraphicsBeginImageContextWithOptions(size, NO, 0);
+    CGFloat scaleRatio = kScreenScale/self.scale;
+    size.width = size.width*scaleRatio;
+    size.height = size.height*scaleRatio;
+    
+    UIGraphicsBeginImageContextWithOptions(size, NO, self.scale);
     [self drawInRect:CGRectMake(0, 0, size.width, size.height) withContentMode:contentMode clipsToBounds:NO];
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     return image;
 }
+
+- (UIImage *)imageByCropToRect:(CGRect)rect {
+    CGFloat scaleRatio = kScreenScale/self.scale;
+    rect.origin.x *= scaleRatio;
+    rect.origin.y *= scaleRatio;
+    rect.size.width *= scaleRatio;
+    rect.size.height *= scaleRatio;
+    
+    if (rect.size.width <= 0 || rect.size.height <= 0) return nil;
+    CGImageRef imageRef = CGImageCreateWithImageInRect(self.CGImage, rect);
+    UIImage *image = [UIImage imageWithCGImage:imageRef scale:self.scale orientation:self.imageOrientation];
+    CGImageRelease(imageRef);
+    return image;
+}
+
+- (UIImage *)imageByRoundCornerRadius:(CGFloat)radius {
+    return [self imageByRoundCornerRadius:radius corners:UIRectCornerAllCorners];
+}
+
+- (UIImage *)imageByRoundCornerRadius:(CGFloat)radius
+                              corners:(UIRectCorner)corners {
+    radius = radius*(kScreenScale/self.scale);
+    
+    if (corners != UIRectCornerAllCorners) {
+        UIRectCorner tmp = 0;
+        if (corners & UIRectCornerTopLeft) tmp |= UIRectCornerBottomLeft;
+        if (corners & UIRectCornerTopRight) tmp |= UIRectCornerBottomRight;
+        if (corners & UIRectCornerBottomLeft) tmp |= UIRectCornerTopLeft;
+        if (corners & UIRectCornerBottomRight) tmp |= UIRectCornerTopRight;
+        corners = tmp;
+    }
+    
+    UIGraphicsBeginImageContextWithOptions(self.size, NO, self.scale);
+    CGContextRef context = UIGraphicsGetCurrentContext();
+    CGRect rect = CGRectMake(0, 0, self.size.width, self.size.height);
+    CGContextScaleCTM(context, 1, -1);
+    CGContextTranslateCTM(context, 0, -rect.size.height);
+    
+    UIBezierPath *path = [UIBezierPath bezierPathWithRoundedRect:rect byRoundingCorners:corners cornerRadii:CGSizeMake(radius, 0.0f)];
+    [path closePath];
+    
+    CGContextSaveGState(context);
+    [path addClip];
+    CGContextDrawImage(context, rect, self.CGImage);
+    CGContextRestoreGState(context);
+    
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
+}
+
 @end

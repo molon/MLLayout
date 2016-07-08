@@ -9,12 +9,13 @@
 #import <UIKit/UIKit.h>
 
 /**
- source of YYKit
+ code from YYKit
  */
 @interface UIImage (CornerAndAspectFill)
 
 - (UIImage *)imageByRoundCornerRadius:(CGFloat)radius;
-- (UIImage *)imageByRoundCornerRadius:(CGFloat)radius corners:(UIRectCorner)corners borderWidth:(CGFloat)borderWidth;
+- (UIImage *)imageByRoundCornerRadius:(CGFloat)radius
+                              corners:(UIRectCorner)corners;
 
 - (UIImage *)imageByResizeToSize:(CGSize)size contentMode:(UIViewContentMode)contentMode;
 
