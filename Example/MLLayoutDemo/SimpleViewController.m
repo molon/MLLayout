@@ -38,7 +38,7 @@
     _bkgView = ({
         UIView *view = [UIView new];
         view.backgroundColor = [UIColor colorWithRed:0.986 green:1.000 blue:0.971 alpha:1.000];
-        view.tag = 101;
+        view.tag = tag++;
         [self.view addSubview:view];
         view;
     });

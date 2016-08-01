@@ -16,8 +16,9 @@
     [super layoutSubviews];
     
     UITableView *tableView = [self currentTableView];
+    NSIndexPath *indexPath;
     if ([tableView isKindOfClass:[MLAutoRecordFrameTableView class]]) {
-        NSIndexPath *indexPath = [tableView indexPathForCell:self];
+        indexPath = [tableView indexPathForCell:self];
         if (!indexPath) {
             return;
         }
@@ -35,6 +36,12 @@
     
     //layout
     [self layoutSubviewsIfNoFrameRecord];
+    
+    if (indexPath) {
+        //cache
+        MLTagViewFrameRecord *frameRecord = [self.contentView exportTagViewFrameRecord];
+        [((MLAutoRecordFrameTableView*)tableView) cacheMLTagViewFrameRecord:frameRecord forRowAtIndexPath:indexPath];
+    }
 }
 
 - (void)layoutSubviewsIfNoFrameRecord {
