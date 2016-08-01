@@ -180,10 +180,6 @@ static inline void deleteIndexFromDictionary(NSInteger index, NSMutableDictionar
                 }
             }
         }
-        
-        for (NSNumber *section in sortedSections) {
-            insertIndexToDictionary([section integerValue], self.tagViewFrameRecordForCellManager.records);
-        }
     }
     
     [super insertRowsAtIndexPaths:indexPaths withRowAnimation:animation];
@@ -217,10 +213,6 @@ static inline void deleteIndexFromDictionary(NSInteger index, NSMutableDictionar
                     deleteIndexFromDictionary([row integerValue], rowDict);
                 }
             }
-        }
-        
-        for (NSNumber *section in [sortedSections reverseObjectEnumerator]) {
-            deleteIndexFromDictionary([section integerValue], self.tagViewFrameRecordForCellManager.records);
         }
     }
     
