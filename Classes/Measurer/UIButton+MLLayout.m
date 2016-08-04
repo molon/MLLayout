@@ -38,11 +38,17 @@ MLLAYOUT_SYNTH_DUMMY_CLASS(UIButton_MLLayout)
      
      see: http://stackoverflow.com/a/28287773/2847401
      */
-    size = [self sizeThatFits:size];
-    //TODO: maybe the size will be narrowed because of `roundPixelValue`
+    CGSize fitSize = [self sizeThatFits:size];
+    
+    //maybe the fit result is bigger than measure size
+    fitSize.width = fmin(size.width, fitSize.width);
+    fitSize.height = fmin(size.height, fitSize.height);
+    
+    //TODO: maybe the size will be narrowed because of `roundPixelValue`, is it will cannot fit size after narrowed?
     //    size.width = ceil(size.width);
     //    size.height = ceil(size.height);
-    return size;
+    
+    return fitSize;
 }
 
 @end
