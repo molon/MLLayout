@@ -334,6 +334,19 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
     }
 }
 
++ (void)checkWhetherIsSubviewsOfSuperview:(UIView*)superview withSublayouts:(NSArray*)sublayouts {
+    NSParameterAssert(superview);
+    NSParameterAssert(sublayouts);
+    
+    for (MLLayout *sublayout in sublayouts) {
+        if (sublayout.view) {
+            NSAssert([superview.subviews containsObject:sublayout->_view], @"\n\n`setSublayouts:`\nA sublayout's view(%@):----------------\n%@\n----------------\nmust be subview of view(%@):----------------\n%@\n----------------\nor nil\n\n",NSStringFromClass(sublayout->_view.class),sublayout->_view,NSStringFromClass(superview.class),superview);
+        }else if (sublayout.sublayouts.count>0) {
+            [MLLayout checkWhetherIsSubviewsOfSuperview:superview withSublayouts:sublayout.sublayouts];
+        }
+    }
+}
+
 #pragma mark - debug description
 - (NSString*)debugDescriptionWithMode:(MLLayoutDebugMode)mode depth:(NSInteger)depth {
     NSMutableString *description = [NSMutableString stringWithFormat:@"%@(%ld):",_view?NSStringFromClass(_view.class):@"MLLayoutHelper",(long)_tag];
@@ -736,16 +749,14 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
 
 - (void)setSublayouts:(NSArray * _Nullable)sublayouts {
 #ifdef DEBUG
-    // whether the sublayout's views is descendant of ancestors'view
+    // whether the sublayout's views is subview of superlayout's view
     MLLayout *closeAncestor = self;
     while (closeAncestor&&closeAncestor->_view==nil) {
         closeAncestor = closeAncestor->_superlayout;
     }
     
     if (closeAncestor) {
-        for (MLLayout *sublayout in sublayouts) {
-            NSAssert(!sublayout->_view||(sublayout->_view!=closeAncestor->_view&&[sublayout->_view isDescendantOfView:closeAncestor->_view]), @"\n\n`setSublayouts:`\nA sublayout's view(%@):----------------\n%@\n----------------\nmust be descendant of close ancestor'view(%@):----------------\n%@\n----------------\nor nil\n\n",NSStringFromClass(sublayout->_view.class),sublayout->_view,NSStringFromClass(closeAncestor->_view.class),closeAncestor->_view);
-        }
+        [MLLayout checkWhetherIsSubviewsOfSuperview:closeAncestor.view withSublayouts:sublayouts];
     }
     
     NSMutableArray *views = [NSMutableArray array];

@@ -77,6 +77,8 @@ static inline MLAutoRecordFrameTableViewCell *kProtypeAutoRecordFrameTableViewCe
 
 + (CGFloat)heightForRowAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout {
     
+    NSAssert([tableView isKindOfClass:[MLAutoRecordFrameTableView class]], @"tableView must be `MLAutoRecordFrameTableView`");
+    
     if (tableView.frame.size.width<=0.0f) {
         return 0.0f;
     }
@@ -112,6 +114,8 @@ static inline MLAutoRecordFrameTableViewCell *kProtypeAutoRecordFrameTableViewCe
 }
 
 + (CGFloat)heightForRowUsingPureMLLayoutAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout {
+    
+    NSAssert([tableView isKindOfClass:[MLAutoRecordFrameTableView class]], @"tableView must be `MLAutoRecordFrameTableView`");
     
     if (tableView.frame.size.width<=0.0f) {
         return 0.0f;
