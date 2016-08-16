@@ -301,9 +301,19 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
 }
 
 - (void)insertSublayout:(MLLayout*)sublayout atIndex:(NSInteger)index {
+    if (!_sublayouts) {
+        _sublayouts = [NSMutableArray array];
+    }
+    
     [((NSMutableArray*)_sublayouts) insertObject:sublayout atIndex:index];
-    [self resetValidSublayouts];
+    
+#ifdef DEBUG
+    [self checkWhetherSublayoutsSuitable:_sublayouts];
+#endif
+    
     sublayout->_superlayout = self;
+    
+    [self resetValidSublayouts];
     
     [sublayout dirtyLayout];
 }
@@ -334,18 +344,68 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
     }
 }
 
+#ifdef DEBUG
 + (void)checkWhetherIsSubviewsOfSuperview:(UIView*)superview withSublayouts:(NSArray*)sublayouts {
     NSParameterAssert(superview);
     NSParameterAssert(sublayouts);
     
     for (MLLayout *sublayout in sublayouts) {
         if (sublayout.view) {
-            NSAssert([superview.subviews containsObject:sublayout->_view], @"\n\n`setSublayouts:`\nA sublayout's view(%@):----------------\n%@\n----------------\nmust be subview of view(%@):----------------\n%@\n----------------\nor nil\n\n",NSStringFromClass(sublayout->_view.class),sublayout->_view,NSStringFromClass(superview.class),superview);
+            NSAssert([superview.subviews containsObject:sublayout->_view], @"\n\n`Sublayouts:`\nA sublayout's view(%@):----------------\n%@\n----------------\nmust be subview of view(%@):----------------\n%@\n----------------\nor nil\n\n",NSStringFromClass(sublayout->_view.class),sublayout->_view,NSStringFromClass(superview.class),superview);
         }else if (sublayout.sublayouts.count>0) {
             [MLLayout checkWhetherIsSubviewsOfSuperview:superview withSublayouts:sublayout.sublayouts];
         }
     }
 }
+
++ (void)checkDuplicateViewsWithCollectViews:(NSMutableArray*)collectViews sublayouts:(NSArray*)sublayouts {
+    NSParameterAssert(collectViews);
+    NSParameterAssert(sublayouts);
+    
+    for (MLLayout *sublayout in sublayouts) {
+        if (sublayout->_view) {
+            NSAssert(![collectViews containsObject:sublayout->_view], @"\n\n`Sublayouts:`\nThe view(%@):\n-------\n%@\n--------\nhas been associated to multi layouts.\n\n",NSStringFromClass(sublayout->_view.class),sublayout->_view);
+            [collectViews addObject:sublayout->_view];
+        }
+        if (sublayout.sublayouts.count>0) {
+            [MLLayout checkDuplicateViewsWithCollectViews:collectViews sublayouts:sublayout.sublayouts];
+        }
+    }
+}
+
+//Only check descendants
+- (void)checkWhetherSublayoutsSuitable:(NSArray*)sublayouts {
+    if (sublayouts.count<=0) {
+        return;
+    }
+    
+    // if `hasMeasure`, no sublayouts //TODO: this is because of that css-layout doesn't support
+    NSAssert(sublayouts.count<=0||(![self hasMeasure]&&sublayouts.count>0), @"\n\n`Sublayouts:`\nThe layout\n----------------\n%@\n----------------\nwhich has measure block or it's view has measure method: Cant owns sublayouts!\n\n",self);
+    
+    // whether the sublayout's views is subview of superlayout's view
+    MLLayout *closeAncestor = self;
+    while (closeAncestor&&closeAncestor->_view==nil) {
+        closeAncestor = closeAncestor->_superlayout;
+    }
+    
+    if (closeAncestor) {
+        [MLLayout checkWhetherIsSubviewsOfSuperview:closeAncestor.view withSublayouts:sublayouts];
+    }
+    
+    // whether sublayout already has its own superlayout.
+    for (MLLayout *sublayout in sublayouts) {
+        NSAssert(!sublayout->_superlayout||[sublayout->_superlayout isEqual:self], @"\n\n`Sublayouts:`\nA sublayout\n----------------\n%@\n----------------\nalready has its own superlayout.\n\n",sublayout);
+    }
+    
+    // whether multi sublayouts associate same view
+    NSMutableArray *views = [NSMutableArray array];
+    if (_view) {
+        [views addObject:_view];
+    }
+    [MLLayout checkDuplicateViewsWithCollectViews:views sublayouts:sublayouts];
+}
+
+#endif
 
 #pragma mark - debug description
 - (NSString*)debugDescriptionWithMode:(MLLayoutDebugMode)mode depth:(NSInteger)depth {
@@ -485,12 +545,12 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
     if (_view&&!CGRectEqualToRect(_view.frame, _frame)) {
         [updatedLayoutsWithNewFrame addObject:self];
     }
-//    if (!CGRectEqualToRect(frame, _frame)) {
-//        _frame = frame;
-//        if (_view) {
-//            [updatedLayoutsWithNewFrame addObject:self];
-//        }
-//    }
+    //    if (!CGRectEqualToRect(frame, _frame)) {
+    //        _frame = frame;
+    //        if (_view) {
+    //            [updatedLayoutsWithNewFrame addObject:self];
+    //        }
+    //    }
     
     absolutePosition.x += _node->layout.position[CSS_LEFT] + layoutHelperOffset.x;
     absolutePosition.y += _node->layout.position[CSS_TOP] + layoutHelperOffset.y;
@@ -706,7 +766,7 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
 }
 
 - (NSString*)description {
-    return [self debugDescriptionWithMode:MLLayoutDebugModeViewLayoutFrame|MLLayoutDebugModeOriginalLayoutFrame|MLLayoutDebugModeStyle];
+    return [NSString stringWithFormat:@"%p %@",self,[self debugDescriptionWithMode:MLLayoutDebugModeViewLayoutFrame|MLLayoutDebugModeOriginalLayoutFrame|MLLayoutDebugModeStyle]];
 }
 
 #pragma mark - setter
@@ -744,32 +804,15 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
     
     _node->measure = [self hasMeasure]?measureNode:NULL;
     
+    NSAssert(!_node->measure||(_node->measure&&_sublayouts.count<=0), @"\n\n`Sublayouts:`\nThe layout \n----------------\n%@\n----------------\nwhich has measure block or it's view has measure method: Cant owns sublayouts!\n\n",self);
+    
     [self dirtyLayout];
 }
 
 - (void)setSublayouts:(NSArray * _Nullable)sublayouts {
 #ifdef DEBUG
-    // whether the sublayout's views is subview of superlayout's view
-    MLLayout *closeAncestor = self;
-    while (closeAncestor&&closeAncestor->_view==nil) {
-        closeAncestor = closeAncestor->_superlayout;
-    }
-    
-    if (closeAncestor) {
-        [MLLayout checkWhetherIsSubviewsOfSuperview:closeAncestor.view withSublayouts:sublayouts];
-    }
-    
-    NSMutableArray *views = [NSMutableArray array];
-    // whether sublayout already has its own superlayout.
-    // whether multi sublayouts associate same view
-    for (MLLayout *sublayout in sublayouts) {
-        NSAssert(!sublayout->_superlayout, @"\n\n`setSublayouts:`\nA sublayout already has its own superlayout.\n\n");
-        if (sublayout->_view) {
-            NSAssert(![views containsObject:sublayout->_view], @"\n\n`setSublayouts:`\nThe view(%@):\n-------\n%@\n--------\nhas been associated to multi layouts.\n\n",NSStringFromClass(sublayout->_view.class),sublayout->_view);
-            [views addObject:sublayout->_view];
-        }
-    }
-    views = nil;
+    //Only check descendants
+    [self checkWhetherSublayoutsSuitable:sublayouts];
 #endif
     _sublayouts = [sublayouts mutableCopy];
     for (MLLayout *sublayout in _sublayouts) {
@@ -883,9 +926,9 @@ CSS_PROPERTY(flex, Flex, flex, CGFloat, float)
     node->next_child = NULL;
     
     node->context = (__bridge void *)layout;
-//    node->is_dirty = isDirty;
-//    node->get_child = getSubNode;
-//    node->print = printLayout;
+    //    node->is_dirty = isDirty;
+    //    node->get_child = getSubNode;
+    //    node->print = printLayout;
     layout->_node = node;
     
     //other
