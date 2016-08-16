@@ -5,7 +5,6 @@ platform :ios, '7.0'
 workspace 'MLLayoutDemo.xcworkspace'
 
 target 'MLLayoutDemo' do
-	project 'MLLayoutDemo.xcodeproj'
 	pod 'SDWebImage'
 	pod 'MLLayout', :path => '../MLLayout.podspec'
 end
