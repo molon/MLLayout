@@ -134,6 +134,7 @@
                          [MLLayout layoutWithTagView:_imageView block:^(MLLayout * _Nonnull l) {
                              //test MLLayoutPositionRelative
                              l.position = MLLayoutPositionRelative;
+                             l.height = 50.0f; //test auto fit width
                              l.bottom = 10.0f;
                          }],
                          bkgViewLayout
