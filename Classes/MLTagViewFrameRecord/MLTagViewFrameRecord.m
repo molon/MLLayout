@@ -74,7 +74,7 @@
 }
 
 - (NSString*)description {
-    return [self debugDescriptionWithSub:NO];
+    return [self debugDescriptionWithSub:YES];
 }
 
 - (NSString*)debugDescriptionWithSub:(BOOL)sub {

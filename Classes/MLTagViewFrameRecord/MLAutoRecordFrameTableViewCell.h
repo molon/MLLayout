@@ -44,6 +44,30 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Get height of indexPath, if cached, return it directly.
+ @warning The method only support for cells which has a corresponding nib named NSStringFromClass([cell class])
+ 
+ @param indexPath    indexPath
+ @param tableView    tableView
+ @param beforeLayout the prepare block before layout, do set model to cell or others.
+ 
+ @return height of indexPath
+ */
++ (CGFloat)heightForRowFromNibAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout;
+
+/**
+ Get height of indexPath, if cached, return it directly.
+ 
+ @param indexPath        indexPath
+ @param tableView        tableView
+ @param protypeCellBlock a block which return a protype cell for calc
+ @param beforeLayout     the prepare block before layout, do set model to cell or others.
+ 
+ @return height of indexPath
+ */
++ (CGFloat)heightForRowAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView protypeCellBlock:(MLAutoRecordFrameTableViewCell *(^)(Class cellCls))protypeCellBlock beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout;
+
+/**
+ Get height of indexPath, if cached, return it directly.
  @warning The method only support for cells whose all subviews'frame can be determined with it's `layoutOfContentView` property.
  
  @param indexPath    indexPath
@@ -54,6 +78,31 @@ NS_ASSUME_NONNULL_BEGIN
  */
 + (CGFloat)heightForRowUsingPureMLLayoutAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout;
 
+/**
+ Get height of indexPath, if cached, return it directly.
+ @warning The method only support for cells whose all subviews'frame can be determined with it's `layoutOfContentView` property.
+ @warning The method only support for cells which has a corresponding nib named NSStringFromClass([cell class])
+ 
+ @param indexPath    indexPath
+ @param tableView    tableView
+ @param beforeLayout the prepare block before layout, do set model to cell or others.
+ 
+ @return height of indexPath
+ */
++ (CGFloat)heightForRowUsingPureMLLayoutFromNibAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout;
+
+/**
+ Get height of indexPath, if cached, return it directly.
+ @warning The method only support for cells whose all subviews'frame can be determined with it's `layoutOfContentView` property.
+ 
+ @param indexPath        indexPath
+ @param tableView        tableView
+ @param protypeCellBlock a block which return a protype cell for calc
+ @param beforeLayout     the prepare block before layout, do set model to cell or others.
+ 
+ @return height of indexPath
+ */
++ (CGFloat)heightForRowUsingPureMLLayoutAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView protypeCellBlock:(MLAutoRecordFrameTableViewCell *(^)(Class cellCls))protypeCellBlock beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout;
 @end
 
 NS_ASSUME_NONNULL_END

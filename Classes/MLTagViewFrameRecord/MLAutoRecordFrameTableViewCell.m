@@ -18,15 +18,28 @@
     UITableView *tableView = [self currentTableView];
     NSIndexPath *indexPath;
     if ([tableView isKindOfClass:[MLAutoRecordFrameTableView class]]) {
-        indexPath = [tableView indexPathForCell:self];
+        /* 
+         Sometimes `indexPathForCell` cant find indexPath of cell, so we use `indexPathForRowAtPoint`
+         But if self.height == 0, `indexPathForRowAtPoint` method returns the next indexPath,
+         This is not what we expected, so we must check it.
+        */
+        if (self.frame.size.height<=0.0f) {
+            return;
+        }
+        
+        indexPath = [tableView indexPathForRowAtPoint:self.center];
+        NSAssert(indexPath, @"Cant find indexPath for cell:%@",self);
         if (!indexPath) {
             return;
         }
         
         MLTagViewFrameRecord *frameRecord = [((MLAutoRecordFrameTableView*)tableView) cachedMLTagViewFrameRecordForRowAtIndexPath:indexPath];
         if (frameRecord) {
-            [frameRecord layoutTagViewsWithRootView:self.contentView];
-            return;
+            NSAssert(frameRecord.isDirtyBlock, @"the cached root frame record must have isDirtyBlock");
+            if (!frameRecord.isDirtyBlock(@(self.contentView.frame.size.width))) {
+                [frameRecord layoutTagViewsWithRootView:self.contentView];
+                return;
+            }
         }
     }
     
@@ -40,6 +53,11 @@
     if (indexPath) {
         //cache
         MLTagViewFrameRecord *frameRecord = [self.contentView exportTagViewFrameRecord];
+        //If new width is not equal to calc width, is dirty
+        NSInteger calcWidth = self.contentView.frame.size.width;
+        [frameRecord setIsDirtyBlock:^BOOL(id _Nonnull userInfo) {
+            return [userInfo integerValue]!=calcWidth;
+        }];
         [((MLAutoRecordFrameTableView*)tableView) cacheMLTagViewFrameRecord:frameRecord forRowAtIndexPath:indexPath];
     }
 }
@@ -54,6 +72,88 @@
         view = view.superview;
     }
     return (UITableView*)view;
+}
+
++ (CGFloat)heightForRowAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView protypeCellBlock:(MLAutoRecordFrameTableViewCell *(^)(Class cellCls))protypeCellBlock beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout {
+    NSParameterAssert(protypeCellBlock);
+    NSAssert([tableView isKindOfClass:[MLAutoRecordFrameTableView class]], @"tableView must be `MLAutoRecordFrameTableView`");
+    
+    if (tableView.frame.size.width<=0.0f) {
+        return 0.0f;
+    }
+    
+    //find the cache
+    MLTagViewFrameRecord *frameRecord = [((MLAutoRecordFrameTableView*)tableView) cachedMLTagViewFrameRecordForRowAtIndexPath:indexPath];
+    if (frameRecord) {
+        return frameRecord.frame.size.height;
+    }
+    
+    MLAutoRecordFrameTableViewCell *protypeCell = protypeCellBlock([self class]);
+    
+    if (protypeCell.frame.size.width!=tableView.frame.size.width) {
+        CGRect frame = protypeCell.frame;
+        frame.size.width = tableView.frame.size.width;
+        protypeCell.frame = frame;
+    }
+    
+    if (beforeLayout) {
+        beforeLayout(protypeCell);
+    }
+    
+    //because `layoutIfNeeded` will set new frames to all updated subviews.
+    //so the performance is bad.
+    [protypeCell setNeedsLayout];
+    [protypeCell layoutIfNeeded];
+    
+    //cache
+    frameRecord = [protypeCell.contentView exportTagViewFrameRecord];
+    
+    //If new width is not equal to calc width, is dirty
+    NSInteger calcWidth = protypeCell.contentView.frame.size.width;
+    [frameRecord setIsDirtyBlock:^BOOL(id _Nonnull userInfo) {
+        return [userInfo integerValue]!=calcWidth;
+    }];
+    
+    [tableView cacheMLTagViewFrameRecord:frameRecord forRowAtIndexPath:indexPath];
+    
+    return frameRecord.frame.size.height;
+}
+
++ (CGFloat)heightForRowUsingPureMLLayoutAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView protypeCellBlock:(MLAutoRecordFrameTableViewCell *(^)(Class cellCls))protypeCellBlock beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout {
+    NSParameterAssert(protypeCellBlock);
+    NSAssert([tableView isKindOfClass:[MLAutoRecordFrameTableView class]], @"tableView must be `MLAutoRecordFrameTableView`");
+    
+    if (tableView.frame.size.width<=0.0f) {
+        return 0.0f;
+    }
+    
+    //find the cache
+    MLTagViewFrameRecord *frameRecord = [((MLAutoRecordFrameTableView*)tableView) cachedMLTagViewFrameRecordForRowAtIndexPath:indexPath];
+    if (frameRecord) {
+        return frameRecord.frame.size.height;
+    }
+    
+    MLAutoRecordFrameTableViewCell *protypeCell = protypeCellBlock([self class]);
+    
+    if (beforeLayout) {
+        beforeLayout(protypeCell);
+    }
+    
+    [protypeCell.layoutOfContentView dirtyAllRelatedLayouts];
+    [protypeCell.layoutOfContentView updatedLayoutsAfterLayoutCalculationWithFrame:CGRectMake(0, 0, tableView.frame.size.width, kMLLayoutUndefined)];
+    
+    //cache
+    frameRecord = [protypeCell.layoutOfContentView exportTagViewFrameRecord];
+    
+    //If new width is not equal to calc width, is dirty
+    NSInteger calcWidth = tableView.frame.size.width;
+    [frameRecord setIsDirtyBlock:^BOOL(id _Nonnull userInfo) {
+        return [userInfo integerValue]!=calcWidth;
+    }];
+    
+    [tableView cacheMLTagViewFrameRecord:frameRecord forRowAtIndexPath:indexPath];
+    
+    return frameRecord.frame.size.height;
 }
 
 static inline MLAutoRecordFrameTableViewCell *kProtypeAutoRecordFrameTableViewCell(Class cls) {
@@ -74,73 +174,46 @@ static inline MLAutoRecordFrameTableViewCell *kProtypeAutoRecordFrameTableViewCe
     return protypeCell;
 }
 
-
 + (CGFloat)heightForRowAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout {
-    
-    NSAssert([tableView isKindOfClass:[MLAutoRecordFrameTableView class]], @"tableView must be `MLAutoRecordFrameTableView`");
-    
-    if (tableView.frame.size.width<=0.0f) {
-        return 0.0f;
-    }
-    
-    //find the cache
-    MLTagViewFrameRecord *frameRecord = [((MLAutoRecordFrameTableView*)tableView) cachedMLTagViewFrameRecordForRowAtIndexPath:indexPath];
-    if (frameRecord) {
-        return frameRecord.frame.size.height;
-    }
-    
-    MLAutoRecordFrameTableViewCell *protypeCell = kProtypeAutoRecordFrameTableViewCell([self class]);
-    
-    if (protypeCell.frame.size.width!=tableView.frame.size.width) {
-        CGRect frame = protypeCell.frame;
-        frame.size.width = tableView.frame.size.width;
-        protypeCell.frame = frame;
-    }
-    
-    if (beforeLayout) {
-        beforeLayout(protypeCell);
-    }
-    
-    //because `layoutIfNeeded` will set new frames to all updated subviews.
-    //so the performance is bad.
-    [protypeCell setNeedsLayout];
-    [protypeCell layoutIfNeeded];
-    
-    //cache
-    frameRecord = [protypeCell.contentView exportTagViewFrameRecord];
-    [tableView cacheMLTagViewFrameRecord:frameRecord forRowAtIndexPath:indexPath];
-    
-    return frameRecord.frame.size.height;
+    return [self heightForRowAtIndexPath:indexPath tableView:tableView protypeCellBlock:^MLAutoRecordFrameTableViewCell *(__unsafe_unretained Class cellCls) {
+        return kProtypeAutoRecordFrameTableViewCell(cellCls);
+    } beforeLayout:beforeLayout];
 }
 
 + (CGFloat)heightForRowUsingPureMLLayoutAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout {
-    
-    NSAssert([tableView isKindOfClass:[MLAutoRecordFrameTableView class]], @"tableView must be `MLAutoRecordFrameTableView`");
-    
-    if (tableView.frame.size.width<=0.0f) {
-        return 0.0f;
-    }
-    
-    //find the cache
-    MLTagViewFrameRecord *frameRecord = [((MLAutoRecordFrameTableView*)tableView) cachedMLTagViewFrameRecordForRowAtIndexPath:indexPath];
-    if (frameRecord) {
-        return frameRecord.frame.size.height;
-    }
-    
-    MLAutoRecordFrameTableViewCell *protypeCell = kProtypeAutoRecordFrameTableViewCell([self class]);
-    
-    if (beforeLayout) {
-        beforeLayout(protypeCell);
-    }
-    
-    [protypeCell.layoutOfContentView dirtyAllRelatedLayouts];
-    [protypeCell.layoutOfContentView updatedLayoutsAfterLayoutCalculationWithFrame:CGRectMake(0, 0, tableView.frame.size.width, kMLLayoutUndefined)];
-    
-    //cache
-    frameRecord = [protypeCell.layoutOfContentView exportTagViewFrameRecord];
-    [tableView cacheMLTagViewFrameRecord:frameRecord forRowAtIndexPath:indexPath];
-    
-    return frameRecord.frame.size.height;
+    return [self heightForRowUsingPureMLLayoutAtIndexPath:indexPath tableView:tableView protypeCellBlock:^MLAutoRecordFrameTableViewCell *(__unsafe_unretained Class cellCls) {
+        return kProtypeAutoRecordFrameTableViewCell(cellCls);
+    } beforeLayout:beforeLayout];
 }
 
+static inline MLAutoRecordFrameTableViewCell *kProtypeAutoRecordFrameTableViewCellFromNib(Class cls) {
+    NSCAssert([cls isSubclassOfClass:[MLAutoRecordFrameTableViewCell class]], @"cls must be subclass of `MLAutoRecordFrameTableViewCell` class");
+    
+    static NSMutableDictionary *protypeCells = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        protypeCells = [NSMutableDictionary dictionary];
+    });
+    
+    NSString *clsName = NSStringFromClass(cls);
+    MLAutoRecordFrameTableViewCell *protypeCell = protypeCells[clsName];
+    if (!protypeCell) {
+        protypeCell = [[[NSBundle mainBundle]loadNibNamed:clsName owner:nil options:nil]lastObject];
+        NSCAssert(protypeCell, @"Cant find a valid tableViewCell from nib named %@",clsName);
+        protypeCells[clsName] = protypeCell;
+    }
+    return protypeCell;
+}
+
++ (CGFloat)heightForRowFromNibAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout {
+    return [self heightForRowAtIndexPath:indexPath tableView:tableView protypeCellBlock:^MLAutoRecordFrameTableViewCell *(__unsafe_unretained Class cellCls) {
+        return kProtypeAutoRecordFrameTableViewCellFromNib(cellCls);
+    } beforeLayout:beforeLayout];
+}
+
++ (CGFloat)heightForRowUsingPureMLLayoutFromNibAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout {
+    return [self heightForRowUsingPureMLLayoutAtIndexPath:indexPath tableView:tableView protypeCellBlock:^MLAutoRecordFrameTableViewCell *(__unsafe_unretained Class cellCls) {
+        return kProtypeAutoRecordFrameTableViewCellFromNib(cellCls);
+    } beforeLayout:beforeLayout];
+}
 @end
