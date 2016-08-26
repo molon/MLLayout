@@ -11,6 +11,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MLTagViewFrameRecord : NSObject
 
+/**
+ the block is only valid in the root record
+ */
+@property (nonatomic, copy) BOOL (^isDirtyBlock)(id userInfo);
+
 @property (nonatomic, assign, readonly) NSInteger tag;
 @property (nonatomic, assign, readonly) CGRect frame;
 @property (nonatomic, strong, readonly) NSArray<MLTagViewFrameRecord*> *subrecords;

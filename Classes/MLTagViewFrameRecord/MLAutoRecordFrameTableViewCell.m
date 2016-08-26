@@ -18,15 +18,28 @@
     UITableView *tableView = [self currentTableView];
     NSIndexPath *indexPath;
     if ([tableView isKindOfClass:[MLAutoRecordFrameTableView class]]) {
-        indexPath = [tableView indexPathForCell:self];
+        /* 
+         Sometimes `indexPathForCell` cant find indexPath of cell, so we use `indexPathForRowAtPoint`
+         But if self.height == 0, `indexPathForRowAtPoint` method returns the next indexPath,
+         This is not what we expected, so we must check it.
+        */
+        if (self.frame.size.height<=0.0f) {
+            return;
+        }
+        
+        indexPath = [tableView indexPathForRowAtPoint:self.center];
+        NSAssert(indexPath, @"Cant find indexPath for cell:%@",self);
         if (!indexPath) {
             return;
         }
         
         MLTagViewFrameRecord *frameRecord = [((MLAutoRecordFrameTableView*)tableView) cachedMLTagViewFrameRecordForRowAtIndexPath:indexPath];
         if (frameRecord) {
-            [frameRecord layoutTagViewsWithRootView:self.contentView];
-            return;
+            NSAssert(frameRecord.isDirtyBlock, @"the cached root frame record must have isDirtyBlock");
+            if (!frameRecord.isDirtyBlock(@(self.contentView.frame.size.width))) {
+                [frameRecord layoutTagViewsWithRootView:self.contentView];
+                return;
+            }
         }
     }
     
@@ -40,6 +53,11 @@
     if (indexPath) {
         //cache
         MLTagViewFrameRecord *frameRecord = [self.contentView exportTagViewFrameRecord];
+        //If new width is not equal to calc width, is dirty
+        NSInteger calcWidth = self.contentView.frame.size.width;
+        [frameRecord setIsDirtyBlock:^BOOL(id _Nonnull userInfo) {
+            return [userInfo integerValue]!=calcWidth;
+        }];
         [((MLAutoRecordFrameTableView*)tableView) cacheMLTagViewFrameRecord:frameRecord forRowAtIndexPath:indexPath];
     }
 }
@@ -89,6 +107,13 @@
     
     //cache
     frameRecord = [protypeCell.contentView exportTagViewFrameRecord];
+    
+    //If new width is not equal to calc width, is dirty
+    NSInteger calcWidth = protypeCell.contentView.frame.size.width;
+    [frameRecord setIsDirtyBlock:^BOOL(id _Nonnull userInfo) {
+        return [userInfo integerValue]!=calcWidth;
+    }];
+    
     [tableView cacheMLTagViewFrameRecord:frameRecord forRowAtIndexPath:indexPath];
     
     return frameRecord.frame.size.height;
@@ -119,6 +144,13 @@
     
     //cache
     frameRecord = [protypeCell.layoutOfContentView exportTagViewFrameRecord];
+    
+    //If new width is not equal to calc width, is dirty
+    NSInteger calcWidth = tableView.frame.size.width;
+    [frameRecord setIsDirtyBlock:^BOOL(id _Nonnull userInfo) {
+        return [userInfo integerValue]!=calcWidth;
+    }];
+    
     [tableView cacheMLTagViewFrameRecord:frameRecord forRowAtIndexPath:indexPath];
     
     return frameRecord.frame.size.height;
