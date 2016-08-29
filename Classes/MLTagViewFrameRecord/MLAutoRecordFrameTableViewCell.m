@@ -22,14 +22,17 @@
          Sometimes `indexPathForCell` cant find indexPath of cell, so we use `indexPathForRowAtPoint`
          But if self.height == 0, `indexPathForRowAtPoint` method returns the next indexPath,
          This is not what we expected, so we must check it.
-        */
+         */
+        //TODO: need to consider whether continue excuted `layoutSubviewsIfNoFrameRecord` below
         if (self.frame.size.height<=0.0f) {
             return;
         }
         
         indexPath = [tableView indexPathForRowAtPoint:self.center];
-        NSAssert(indexPath, @"Cant find indexPath for cell:%@",self);
+//        NSAssert(indexPath, @"Cant find indexPath for cell:%@",self);
+        //TODO: need to consider whether continue excuted `layoutSubviewsIfNoFrameRecord` below
         if (!indexPath) {
+            NSLog(@"Warning: Cant find indexPath for cell:%@",self);
             return;
         }
         
