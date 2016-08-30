@@ -20,6 +20,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) MLLayout *layoutOfContentView;
 
 /**
+ The indexPath which can be autoset with `dequeueReusableCellWithIdentifier:forIndexPath:`
+ */
+@property (nonatomic, strong) NSIndexPath *indexPath;
+
+/**
  For override , like `layoutSubviews`, but it's only called when no frame record.
  @warning Must ensure the final frame of `contentView` set. it's height is used for `heightWithTableView:indexPath:beforeLayout:` method. 
  @warning self.contentView.frame.size.height is meaningless at the begin of call.
