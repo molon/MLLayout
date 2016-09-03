@@ -12,28 +12,22 @@
 
 @implementation MLAutoRecordFrameTableViewCell
 
+- (void)prepareForReuse {
+    [super prepareForReuse];
+    
+    self.indexPath = nil;
+}
+
 - (void)layoutSubviews {
     [super layoutSubviews];
     
     UITableView *tableView = [self currentTableView];
-    NSIndexPath *indexPath;
     if ([tableView isKindOfClass:[MLAutoRecordFrameTableView class]]) {
-        /* 
-         Sometimes `indexPathForCell` cant find indexPath of cell, so we use `indexPathForRowAtPoint`
-         But if self.height == 0, `indexPathForRowAtPoint` method returns the next indexPath,
-         This is not what we expected, so we must check it.
-        */
-        if (self.frame.size.height<=0.0f) {
+        if (!self.indexPath) {
             return;
         }
         
-        indexPath = [tableView indexPathForRowAtPoint:self.center];
-        NSAssert(indexPath, @"Cant find indexPath for cell:%@",self);
-        if (!indexPath) {
-            return;
-        }
-        
-        MLTagViewFrameRecord *frameRecord = [((MLAutoRecordFrameTableView*)tableView) cachedMLTagViewFrameRecordForRowAtIndexPath:indexPath];
+        MLTagViewFrameRecord *frameRecord = [((MLAutoRecordFrameTableView*)tableView) cachedMLTagViewFrameRecordForRowAtIndexPath:self.indexPath];
         if (frameRecord) {
             NSAssert(frameRecord.isDirtyBlock, @"the cached root frame record must have isDirtyBlock");
             if (!frameRecord.isDirtyBlock(@(self.contentView.frame.size.width))) {
@@ -50,7 +44,7 @@
     //layout
     [self layoutSubviewsIfNoFrameRecord];
     
-    if (indexPath) {
+    if ([tableView isKindOfClass:[MLAutoRecordFrameTableView class]]&&self.indexPath) {
         //cache
         MLTagViewFrameRecord *frameRecord = [self.contentView exportTagViewFrameRecord];
         //If new width is not equal to calc width, is dirty
@@ -58,7 +52,7 @@
         [frameRecord setIsDirtyBlock:^BOOL(id _Nonnull userInfo) {
             return [userInfo integerValue]!=calcWidth;
         }];
-        [((MLAutoRecordFrameTableView*)tableView) cacheMLTagViewFrameRecord:frameRecord forRowAtIndexPath:indexPath];
+        [((MLAutoRecordFrameTableView*)tableView) cacheMLTagViewFrameRecord:frameRecord forRowAtIndexPath:self.indexPath];
     }
 }
 
@@ -89,6 +83,8 @@
     }
     
     MLAutoRecordFrameTableViewCell *protypeCell = protypeCellBlock([self class]);
+    [protypeCell prepareForReuse];
+    protypeCell.indexPath = indexPath;
     
     if (protypeCell.frame.size.width!=tableView.frame.size.width) {
         CGRect frame = protypeCell.frame;
@@ -134,6 +130,8 @@
     }
     
     MLAutoRecordFrameTableViewCell *protypeCell = protypeCellBlock([self class]);
+    [protypeCell prepareForReuse];
+    protypeCell.indexPath = indexPath;
     
     if (beforeLayout) {
         beforeLayout(protypeCell);

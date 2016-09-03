@@ -7,6 +7,7 @@
 
 #import "MLAutoRecordFrameTableView.h"
 #import "MLTagViewFrameRecord.h"
+#import "MLAutoRecordFrameTableViewCell.h"
 
 static inline void insertIndexToDictionary(NSInteger index, NSMutableDictionary *dictionary) {
     if (!dictionary) {
@@ -238,6 +239,14 @@ static inline void deleteIndexFromDictionary(NSInteger index, NSMutableDictionar
     }
     
     [super moveRowAtIndexPath:indexPath toIndexPath:newIndexPath];
+}
+
+- (UITableViewCell *)dequeueReusableCellWithIdentifier:(NSString *)identifier forIndexPath:(NSIndexPath *)indexPath {
+    UITableViewCell *cell = [super dequeueReusableCellWithIdentifier:identifier forIndexPath:indexPath];
+    if ([cell isKindOfClass:[MLAutoRecordFrameTableViewCell class]]) {
+        ((MLAutoRecordFrameTableViewCell*)cell).indexPath = indexPath;
+    }
+    return cell;
 }
 
 - (void)reloadData {
