@@ -17,12 +17,12 @@ NS_ASSUME_NONNULL_BEGIN
  The mllayout of contentView.
  see warning of `heightForRowUsingPureMLLayoutAtIndexPath:tableView:beforeLayout:` method.
  */
-@property (nonatomic, strong) MLLayout *layoutOfContentView;
+@property (nullable, nonatomic, strong) MLLayout *layoutOfContentView;
 
 /**
  The indexPath which can be autoset with `dequeueReusableCellWithIdentifier:forIndexPath:`
  */
-@property (nonatomic, strong) NSIndexPath *indexPath;
+@property (nullable, nonatomic, strong) NSIndexPath *indexPath;
 
 /**
  For override , like `layoutSubviews`, but it's only called when no frame record.
