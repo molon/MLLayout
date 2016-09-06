@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name         = "MLLayout"
-s.version      = "0.2.4"
+s.version      = "0.3.0"
 s.summary      = "Flexbox in Objective-C, using Facebook's css-layout."
 
 s.homepage     = 'https://github.com/molon/MLLayout'
