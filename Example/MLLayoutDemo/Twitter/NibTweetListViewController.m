@@ -1,17 +1,17 @@
 //
-//  TweetListViewController.m
+//  NibTweetListViewController.m
 //  MLLayoutDemo
 //
-//  Created by molon on 16/6/28.
+//  Created by molon on 2016/10/9.
 //  Copyright © 2016年 molon. All rights reserved.
 //
 
-#import "TweetListViewController.h"
-#import "TweetTableViewCell.h"
+#import "NibTweetListViewController.h"
 #import <MLAutoRecordFrameTableView.h>
 #import "Tweet.h"
+#import "NibTweetTableViewCell.h"
 
-@interface TweetListViewController ()<UITableViewDelegate,UITableViewDataSource>
+@interface NibTweetListViewController ()<UITableViewDelegate,UITableViewDataSource>
 
 @property (nonatomic, strong) MLAutoRecordFrameTableView *tableView;
 
@@ -19,7 +19,8 @@
 
 @end
 
-@implementation TweetListViewController
+@implementation NibTweetListViewController
+
 
 - (instancetype)init {
     self = [super init];
@@ -28,7 +29,7 @@
             MLAutoRecordFrameTableView *tableView = [[MLAutoRecordFrameTableView alloc]initWithFrame:CGRectZero style:UITableViewStylePlain];
             tableView.delegate = self;
             tableView.dataSource = self;
-            [tableView registerClass:[TweetTableViewCell class] forCellReuseIdentifier:NSStringFromClass([TweetTableViewCell class])];
+            [tableView registerNib:[UINib nibWithNibName:NSStringFromClass([NibTweetTableViewCell class]) bundle:[NSBundle mainBundle]] forCellReuseIdentifier:NSStringFromClass([NibTweetTableViewCell class])];
             tableView;
         });
     }
@@ -37,7 +38,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
-    self.title = @"Twitter Demo";
+    self.title = @"Nib Twitter Demo";
     [self.view addSubview:_tableView];
     
     NSMutableArray *tweets = [NSMutableArray array];
@@ -78,13 +79,13 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    TweetTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:NSStringFromClass([TweetTableViewCell class]) forIndexPath:indexPath];
-    
+    NibTweetTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:NSStringFromClass([NibTweetTableViewCell class]) forIndexPath:indexPath];
+
     if (!cell.indexPathForMLAutoRecordFrameBlock) {
         __weak __typeof__(self) wSelf = self;
         [cell setIndexPathForMLAutoRecordFrameBlock:^NSIndexPath * _Nullable(MLAutoRecordFrameTableViewCell * _Nonnull cell) {
             __strong __typeof__(wSelf) sSelf = wSelf;
-            NSInteger index = [sSelf.tweets indexOfObject:((TweetTableViewCell*)cell).tweet];
+            NSInteger index = [sSelf.tweets indexOfObject:((NibTweetTableViewCell*)cell).tweet];
             if (index==NSNotFound) {
                 return nil;
             }
@@ -99,20 +100,9 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-    /*
-     The method only support for cells whose all subviews'frame can be determined with it's `layoutOfContentView` property.
-    */
-    return [TweetTableViewCell heightForRowUsingPureMLLayoutAtIndexPath:indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:^(MLAutoRecordFrameTableViewCell * _Nonnull protypeCell) {
-        ((TweetTableViewCell*)protypeCell).tweet = _tweets[indexPath.row];
+    return [NibTweetTableViewCell heightForRowUsingPureMLLayoutFromNibAtIndexPath:indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:^(MLAutoRecordFrameTableViewCell * _Nonnull protypeCell) {
+        ((NibTweetTableViewCell*)protypeCell).tweet = _tweets[indexPath.row];
     }];
-    
-    /*
-     The method's performance is lower than `heightForRowUsingPureMLLayoutAtIndexPath:tableView:beforeLayout:`.
-     But it has no limit of method upon.
-    */
-//    return [TweetTableViewCell heightForRowAtIndexPath:indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:^(MLAutoRecordFrameTableViewCell * _Nonnull protypeCell) {
-//        ((TweetTableViewCell*)protypeCell).tweet = _tweets[indexPath.row];
-//    }];
 }
 
 @end

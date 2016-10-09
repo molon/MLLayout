@@ -20,7 +20,7 @@
     [super viewDidLoad];
     self.title = @"MLLayout";
     
-    self.demoNames = @[@"SimpleViewController",@"TweetListViewController"];
+    self.demoNames = @[@"SimpleViewController",@"TweetListViewController",@"NibTweetListViewController"];
     
     [self.tableView registerClass:[UITableViewCell class] forCellReuseIdentifier:NSStringFromClass([UITableViewCell class])];
 }

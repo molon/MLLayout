@@ -19,8 +19,10 @@
 		363409E11D2191F9000DC870 /* TweetListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 363409E01D2191F9000DC870 /* TweetListViewController.m */; };
 		363409E41D21923D000DC870 /* Tweet.m in Sources */ = {isa = PBXBuildFile; fileRef = 363409E31D21923D000DC870 /* Tweet.m */; };
 		363409E71D219255000DC870 /* TweetTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 363409E61D219255000DC870 /* TweetTableViewCell.m */; };
+		36DDC2EF1DAA7101003BEE7A /* NibTweetTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 36DDC2ED1DAA7101003BEE7A /* NibTweetTableViewCell.m */; };
+		36DDC2F01DAA7101003BEE7A /* NibTweetTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 36DDC2EE1DAA7101003BEE7A /* NibTweetTableViewCell.xib */; };
+		36DDC2F31DAA7766003BEE7A /* NibTweetListViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 36DDC2F21DAA7766003BEE7A /* NibTweetListViewController.m */; };
 		36EED6E61D219B2F002C572D /* twitter.json in Resources */ = {isa = PBXBuildFile; fileRef = 36EED6E51D219B2F002C572D /* twitter.json */; };
-		36EED6EB1D2225DC002C572D /* UIImage+CornerAndAspectFill.m in Sources */ = {isa = PBXBuildFile; fileRef = 36EED6EA1D2225DC002C572D /* UIImage+CornerAndAspectFill.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -64,9 +66,12 @@
 		363409E31D21923D000DC870 /* Tweet.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tweet.m; sourceTree = "<group>"; };
 		363409E51D219255000DC870 /* TweetTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweetTableViewCell.h; sourceTree = "<group>"; };
 		363409E61D219255000DC870 /* TweetTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TweetTableViewCell.m; sourceTree = "<group>"; };
+		36DDC2EC1DAA7101003BEE7A /* NibTweetTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NibTweetTableViewCell.h; sourceTree = "<group>"; };
+		36DDC2ED1DAA7101003BEE7A /* NibTweetTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NibTweetTableViewCell.m; sourceTree = "<group>"; };
+		36DDC2EE1DAA7101003BEE7A /* NibTweetTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = NibTweetTableViewCell.xib; sourceTree = "<group>"; };
+		36DDC2F11DAA7766003BEE7A /* NibTweetListViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NibTweetListViewController.h; sourceTree = "<group>"; };
+		36DDC2F21DAA7766003BEE7A /* NibTweetListViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NibTweetListViewController.m; sourceTree = "<group>"; };
 		36EED6E51D219B2F002C572D /* twitter.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = twitter.json; sourceTree = "<group>"; };
-		36EED6E91D2225DC002C572D /* UIImage+CornerAndAspectFill.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+CornerAndAspectFill.h"; sourceTree = "<group>"; };
-		36EED6EA1D2225DC002C572D /* UIImage+CornerAndAspectFill.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+CornerAndAspectFill.m"; sourceTree = "<group>"; };
 		3CB55C6AB09C6DB4AA4FA9E0 /* libPods-MLLayoutDemo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MLLayoutDemo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BFF6BBE0E509184D483710B4 /* Pods-MLLayoutDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MLLayoutDemo.release.xcconfig"; path = "Pods/Target Support Files/Pods-MLLayoutDemo/Pods-MLLayoutDemo.release.xcconfig"; sourceTree = "<group>"; };
 		E9EF5CB661B4D98F1752A327 /* Pods-MLLayoutDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MLLayoutDemo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MLLayoutDemo/Pods-MLLayoutDemo.debug.xcconfig"; sourceTree = "<group>"; };
@@ -176,14 +181,17 @@
 			isa = PBXGroup;
 			children = (
 				36EED6E51D219B2F002C572D /* twitter.json */,
-				363409DF1D2191F9000DC870 /* TweetListViewController.h */,
-				363409E01D2191F9000DC870 /* TweetListViewController.m */,
 				363409E21D21923D000DC870 /* Tweet.h */,
 				363409E31D21923D000DC870 /* Tweet.m */,
+				363409DF1D2191F9000DC870 /* TweetListViewController.h */,
+				363409E01D2191F9000DC870 /* TweetListViewController.m */,
 				363409E51D219255000DC870 /* TweetTableViewCell.h */,
 				363409E61D219255000DC870 /* TweetTableViewCell.m */,
-				36EED6E91D2225DC002C572D /* UIImage+CornerAndAspectFill.h */,
-				36EED6EA1D2225DC002C572D /* UIImage+CornerAndAspectFill.m */,
+				36DDC2F11DAA7766003BEE7A /* NibTweetListViewController.h */,
+				36DDC2F21DAA7766003BEE7A /* NibTweetListViewController.m */,
+				36DDC2EC1DAA7101003BEE7A /* NibTweetTableViewCell.h */,
+				36DDC2ED1DAA7101003BEE7A /* NibTweetTableViewCell.m */,
+				36DDC2EE1DAA7101003BEE7A /* NibTweetTableViewCell.xib */,
 			);
 			path = Twitter;
 			sourceTree = "<group>";
@@ -275,6 +283,7 @@
 				TargetAttributes = {
 					361136E11D181C45007D28D6 = {
 						CreatedOnToolsVersion = 7.3.1;
+						DevelopmentTeam = PDL85JB6BQ;
 					};
 					361136FA1D181C45007D28D6 = {
 						CreatedOnToolsVersion = 7.3.1;
@@ -314,6 +323,7 @@
 				361136F51D181C45007D28D6 /* LaunchScreen.storyboard in Resources */,
 				361136F21D181C45007D28D6 /* Assets.xcassets in Resources */,
 				36EED6E61D219B2F002C572D /* twitter.json in Resources */,
+				36DDC2F01DAA7101003BEE7A /* NibTweetTableViewCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -390,9 +400,10 @@
 				363409E71D219255000DC870 /* TweetTableViewCell.m in Sources */,
 				3611371B1D181C71007D28D6 /* IndexTableViewController.m in Sources */,
 				361136EA1D181C45007D28D6 /* AppDelegate.m in Sources */,
+				36DDC2F31DAA7766003BEE7A /* NibTweetListViewController.m in Sources */,
 				361136E71D181C45007D28D6 /* main.m in Sources */,
+				36DDC2EF1DAA7101003BEE7A /* NibTweetTableViewCell.m in Sources */,
 				363409E41D21923D000DC870 /* Tweet.m in Sources */,
-				36EED6EB1D2225DC002C572D /* UIImage+CornerAndAspectFill.m in Sources */,
 				362402E41D1A670900D5E5BF /* SimpleViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -529,6 +540,7 @@
 			baseConfigurationReference = E9EF5CB661B4D98F1752A327 /* Pods-MLLayoutDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = PDL85JB6BQ;
 				INFOPLIST_FILE = MLLayoutDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.molon.MLLayoutDemo;
@@ -541,6 +553,7 @@
 			baseConfigurationReference = BFF6BBE0E509184D483710B4 /* Pods-MLLayoutDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = PDL85JB6BQ;
 				INFOPLIST_FILE = MLLayoutDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.molon.MLLayoutDemo;

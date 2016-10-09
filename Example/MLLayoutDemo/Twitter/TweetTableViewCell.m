@@ -10,13 +10,10 @@
 #import "Tweet.h"
 #import <MLLayout.h>
 #import <UIImageView+WebCache.h>
-#import "UIImage+CornerAndAspectFill.h"
 
 #define kImageSide 48.0f
-#define kImageCornerRadius 4.0f
 #define kDetailImageHeight 166.0f
 
-#define kBaseTag 1000
 @interface TweetTableViewCell()
 
 @property (nonatomic, strong) UIImageView *avatarImageView;
@@ -25,7 +22,7 @@
 @property (nonatomic, strong) UILabel *contentLabel;
 @property (nonatomic, strong) UIImageView *detailImageView;
 @property (nonatomic, strong) UIButton *retweetButton;
-@property (nonatomic, strong) UIButton *replayButton;
+@property (nonatomic, strong) UIButton *replyButton;
 @property (nonatomic, strong) UIButton *favButton;
 
 @end
@@ -44,9 +41,10 @@
             UIImageView *imageView = [UIImageView new];
             imageView.contentMode = UIViewContentModeScaleAspectFill;
             imageView.layer.backgroundColor = [UIColor colorWithWhite:0.886 alpha:1.000].CGColor;
-            imageView.layer.cornerRadius = kImageCornerRadius;
             imageView.layer.borderWidth = 1.0f/[UIScreen mainScreen].scale;
             imageView.layer.borderColor = [UIColor colorWithWhite:0.837 alpha:1.000].CGColor;
+            //just for test ,performance of <imageView> is not what the library need to consider
+//            imageView.clipsToBounds = YES;
             imageView.tag = tag++;
             [self.contentView addSubview:imageView];
             imageView;
@@ -102,7 +100,7 @@
             [self.contentView addSubview:button];
             return button;
         };
-        _replayButton = buttonBlock(@"reply");
+        _replyButton = buttonBlock(@"reply");
         _retweetButton = buttonBlock(@"retweet");
         _favButton = buttonBlock(@"fav");
         
@@ -129,7 +127,7 @@
             l.justifyContent = MLLayoutJustifyContentSpaceBetween;
             l.margin = UIEdgeInsetsMake(5.0f, 0, 0, 30.0f);
             l.sublayouts = @[
-                             [MLLayout layoutWithTagView:_replayButton block:^(MLLayout * _Nonnull l) {
+                             [MLLayout layoutWithTagView:_replyButton block:^(MLLayout * _Nonnull l) {
                                  l.minWidth = 50.0f;
                                  l.minHeight = 20.0f;
                              }],
@@ -177,26 +175,8 @@
 - (void)setTweet:(Tweet *)tweet {
     _tweet = tweet;
     
-    //poor implementation , just for test
-    __weak __typeof(self)wself = self;
-    [_avatarImageView sd_setImageWithURL:tweet.avatarURL placeholderImage:nil options:SDWebImageAvoidAutoSetImage completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
-        __block UIImage *result = image;
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            result = [image imageByResizeToSize:CGSizeMake(kImageSide, kImageSide) contentMode:UIViewContentModeScaleAspectFill];
-            result = [result imageByRoundCornerRadius:kImageCornerRadius];
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                if (![imageURL isEqual:wself.avatarImageView.sd_imageURL]) {
-                    return;
-                }
-                
-                wself.avatarImageView.image = result;
-                [wself.avatarImageView setNeedsLayout];
-            });
-        });
-    }];
-    
-    [_detailImageView sd_setImageWithURL:tweet.detailImageURL placeholderImage:nil];
+    [_avatarImageView sd_setImageWithURL:tweet.avatarURL];
+    [_detailImageView sd_setImageWithURL:tweet.detailImageURL];
     
     {
         _detailImageView.hidden = tweet.detailImageURL==nil;

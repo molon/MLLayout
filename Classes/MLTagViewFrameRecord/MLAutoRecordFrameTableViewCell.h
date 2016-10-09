@@ -20,9 +20,17 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nullable, nonatomic, strong) MLLayout *layoutOfContentView;
 
 /**
- The indexPath which can be autoset with `dequeueReusableCellWithIdentifier:forIndexPath:`
+ `layoutSubviews` need to know the indexPath, the indexPath can tells us which frame record cache to be used.
+ @warning If no `indexPathForMLAutoRecordFrameBlock`, indicate dont want to use cache to layout
  */
-@property (nullable, nonatomic, strong) NSIndexPath *indexPath;
+@property (nullable, nonatomic, copy)  NSIndexPath * _Nullable (^indexPathForMLAutoRecordFrameBlock)(MLAutoRecordFrameTableViewCell *cell);
+
+/**
+ setter for indexPathForMLAutoRecordFrameBlock
+ 
+ @param indexPathForMLAutoRecordFrameBlock indexPathForMLAutoRecordFrameBlock
+ */
+- (void)setIndexPathForMLAutoRecordFrameBlock:(NSIndexPath * _Nullable (^ _Nullable)(MLAutoRecordFrameTableViewCell * _Nonnull cell))indexPathForMLAutoRecordFrameBlock;
 
 /**
  For override , like `layoutSubviews`, but it's only called when no frame record.
@@ -45,7 +53,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @return height of indexPath
  */
-+ (CGFloat)heightForRowAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout;
++ (CGFloat)heightForRowAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(MLAutoRecordFrameTableViewCell *protypeCell))beforeLayout;
 
 /**
  Get height of indexPath, if cached, return it directly.
@@ -57,7 +65,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @return height of indexPath
  */
-+ (CGFloat)heightForRowFromNibAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout;
++ (CGFloat)heightForRowFromNibAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(MLAutoRecordFrameTableViewCell *protypeCell))beforeLayout;
 
 /**
  Get height of indexPath, if cached, return it directly.
@@ -69,7 +77,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @return height of indexPath
  */
-+ (CGFloat)heightForRowAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView protypeCellBlock:(MLAutoRecordFrameTableViewCell *(^)(Class cellCls))protypeCellBlock beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout;
++ (CGFloat)heightForRowAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView protypeCellBlock:(MLAutoRecordFrameTableViewCell *(^)(Class cellCls))protypeCellBlock beforeLayout:(nullable void (^)(MLAutoRecordFrameTableViewCell *protypeCell))beforeLayout;
 
 /**
  Get height of indexPath, if cached, return it directly.
@@ -81,7 +89,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @return height of indexPath
  */
-+ (CGFloat)heightForRowUsingPureMLLayoutAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout;
++ (CGFloat)heightForRowUsingPureMLLayoutAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(MLAutoRecordFrameTableViewCell *protypeCell))beforeLayout;
 
 /**
  Get height of indexPath, if cached, return it directly.
@@ -94,7 +102,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @return height of indexPath
  */
-+ (CGFloat)heightForRowUsingPureMLLayoutFromNibAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout;
++ (CGFloat)heightForRowUsingPureMLLayoutFromNibAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(MLAutoRecordFrameTableViewCell *protypeCell))beforeLayout;
 
 /**
  Get height of indexPath, if cached, return it directly.
@@ -107,7 +115,7 @@ NS_ASSUME_NONNULL_BEGIN
  
  @return height of indexPath
  */
-+ (CGFloat)heightForRowUsingPureMLLayoutAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView protypeCellBlock:(MLAutoRecordFrameTableViewCell *(^)(Class cellCls))protypeCellBlock beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout;
++ (CGFloat)heightForRowUsingPureMLLayoutAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView protypeCellBlock:(MLAutoRecordFrameTableViewCell *(^)(Class cellCls))protypeCellBlock beforeLayout:(nullable void (^)(MLAutoRecordFrameTableViewCell *protypeCell))beforeLayout;
 @end
 
 NS_ASSUME_NONNULL_END

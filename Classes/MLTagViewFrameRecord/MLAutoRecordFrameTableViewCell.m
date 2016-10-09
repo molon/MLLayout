@@ -12,22 +12,20 @@
 
 @implementation MLAutoRecordFrameTableViewCell
 
-- (void)prepareForReuse {
-    [super prepareForReuse];
-    
-    self.indexPath = nil;
-}
-
 - (void)layoutSubviews {
     [super layoutSubviews];
     
     UITableView *tableView = [self currentTableView];
-    if ([tableView isKindOfClass:[MLAutoRecordFrameTableView class]]) {
-        if (!self.indexPath) {
+    NSIndexPath *indexPath = nil;
+    if ([tableView isKindOfClass:[MLAutoRecordFrameTableView class]]&&self.indexPathForMLAutoRecordFrameBlock) {
+        //If no indexPathForMLAutoRecordFrameBlock, indicate dont want to use cache to layout
+        indexPath = self.indexPathForMLAutoRecordFrameBlock(self);
+        //If indexPathForMLAutoRecordFrameBlock return nil, indicate current `layoutSubviews` is not necessary, just return.
+        if (!indexPath) {
             return;
         }
         
-        MLTagViewFrameRecord *frameRecord = [((MLAutoRecordFrameTableView*)tableView) cachedMLTagViewFrameRecordForRowAtIndexPath:self.indexPath];
+        MLTagViewFrameRecord *frameRecord = [((MLAutoRecordFrameTableView*)tableView) cachedMLTagViewFrameRecordForRowAtIndexPath:indexPath];
         if (frameRecord) {
             NSAssert(frameRecord.isDirtyBlock, @"the cached root frame record must have isDirtyBlock");
             if (!frameRecord.isDirtyBlock(@(self.contentView.frame.size.width))) {
@@ -44,7 +42,7 @@
     //layout
     [self layoutSubviewsIfNoFrameRecord];
     
-    if ([tableView isKindOfClass:[MLAutoRecordFrameTableView class]]&&self.indexPath) {
+    if (indexPath) {
         //cache
         MLTagViewFrameRecord *frameRecord = [self.contentView exportTagViewFrameRecord];
         //If new width is not equal to calc width, is dirty
@@ -52,7 +50,7 @@
         [frameRecord setIsDirtyBlock:^BOOL(id _Nonnull userInfo) {
             return [userInfo integerValue]!=calcWidth;
         }];
-        [((MLAutoRecordFrameTableView*)tableView) cacheMLTagViewFrameRecord:frameRecord forRowAtIndexPath:self.indexPath];
+        [((MLAutoRecordFrameTableView*)tableView) cacheMLTagViewFrameRecord:frameRecord forRowAtIndexPath:indexPath];
     }
 }
 
@@ -68,7 +66,7 @@
     return (UITableView*)view;
 }
 
-+ (CGFloat)heightForRowAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView protypeCellBlock:(MLAutoRecordFrameTableViewCell *(^)(Class cellCls))protypeCellBlock beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout {
++ (CGFloat)heightForRowAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView protypeCellBlock:(MLAutoRecordFrameTableViewCell *(^)(Class cellCls))protypeCellBlock beforeLayout:(nullable void (^)(MLAutoRecordFrameTableViewCell *protypeCell))beforeLayout {
     NSParameterAssert(protypeCellBlock);
     NSAssert([tableView isKindOfClass:[MLAutoRecordFrameTableView class]], @"tableView must be `MLAutoRecordFrameTableView`");
     
@@ -83,8 +81,6 @@
     }
     
     MLAutoRecordFrameTableViewCell *protypeCell = protypeCellBlock([self class]);
-    [protypeCell prepareForReuse];
-    protypeCell.indexPath = indexPath;
     
     if (protypeCell.frame.size.width!=tableView.frame.size.width) {
         CGRect frame = protypeCell.frame;
@@ -115,7 +111,7 @@
     return frameRecord.frame.size.height;
 }
 
-+ (CGFloat)heightForRowUsingPureMLLayoutAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView protypeCellBlock:(MLAutoRecordFrameTableViewCell *(^)(Class cellCls))protypeCellBlock beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout {
++ (CGFloat)heightForRowUsingPureMLLayoutAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView protypeCellBlock:(MLAutoRecordFrameTableViewCell *(^)(Class cellCls))protypeCellBlock beforeLayout:(nullable void (^)(MLAutoRecordFrameTableViewCell *protypeCell))beforeLayout {
     NSParameterAssert(protypeCellBlock);
     NSAssert([tableView isKindOfClass:[MLAutoRecordFrameTableView class]], @"tableView must be `MLAutoRecordFrameTableView`");
     
@@ -130,8 +126,6 @@
     }
     
     MLAutoRecordFrameTableViewCell *protypeCell = protypeCellBlock([self class]);
-    [protypeCell prepareForReuse];
-    protypeCell.indexPath = indexPath;
     
     if (beforeLayout) {
         beforeLayout(protypeCell);
@@ -172,13 +166,13 @@ static inline MLAutoRecordFrameTableViewCell *kProtypeAutoRecordFrameTableViewCe
     return protypeCell;
 }
 
-+ (CGFloat)heightForRowAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout {
++ (CGFloat)heightForRowAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(MLAutoRecordFrameTableViewCell *protypeCell))beforeLayout {
     return [self heightForRowAtIndexPath:indexPath tableView:tableView protypeCellBlock:^MLAutoRecordFrameTableViewCell *(__unsafe_unretained Class cellCls) {
         return kProtypeAutoRecordFrameTableViewCell(cellCls);
     } beforeLayout:beforeLayout];
 }
 
-+ (CGFloat)heightForRowUsingPureMLLayoutAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout {
++ (CGFloat)heightForRowUsingPureMLLayoutAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(MLAutoRecordFrameTableViewCell *protypeCell))beforeLayout {
     return [self heightForRowUsingPureMLLayoutAtIndexPath:indexPath tableView:tableView protypeCellBlock:^MLAutoRecordFrameTableViewCell *(__unsafe_unretained Class cellCls) {
         return kProtypeAutoRecordFrameTableViewCell(cellCls);
     } beforeLayout:beforeLayout];
@@ -203,13 +197,13 @@ static inline MLAutoRecordFrameTableViewCell *kProtypeAutoRecordFrameTableViewCe
     return protypeCell;
 }
 
-+ (CGFloat)heightForRowFromNibAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout {
++ (CGFloat)heightForRowFromNibAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(MLAutoRecordFrameTableViewCell *protypeCell))beforeLayout {
     return [self heightForRowAtIndexPath:indexPath tableView:tableView protypeCellBlock:^MLAutoRecordFrameTableViewCell *(__unsafe_unretained Class cellCls) {
         return kProtypeAutoRecordFrameTableViewCellFromNib(cellCls);
     } beforeLayout:beforeLayout];
 }
 
-+ (CGFloat)heightForRowUsingPureMLLayoutFromNibAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(UITableViewCell *protypeCell))beforeLayout {
++ (CGFloat)heightForRowUsingPureMLLayoutFromNibAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(MLAutoRecordFrameTableViewCell *protypeCell))beforeLayout {
     return [self heightForRowUsingPureMLLayoutAtIndexPath:indexPath tableView:tableView protypeCellBlock:^MLAutoRecordFrameTableViewCell *(__unsafe_unretained Class cellCls) {
         return kProtypeAutoRecordFrameTableViewCellFromNib(cellCls);
     } beforeLayout:beforeLayout];
