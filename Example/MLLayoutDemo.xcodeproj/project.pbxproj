@@ -284,6 +284,7 @@
 					361136E11D181C45007D28D6 = {
 						CreatedOnToolsVersion = 7.3.1;
 						DevelopmentTeam = PDL85JB6BQ;
+						ProvisioningStyle = Manual;
 					};
 					361136FA1D181C45007D28D6 = {
 						CreatedOnToolsVersion = 7.3.1;
@@ -545,6 +546,8 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.molon.MLLayoutDemo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "87e46ef9-4fe6-4d44-ba32-2df745b38858";
+				PROVISIONING_PROFILE_SPECIFIER = "XC Wildcard";
 			};
 			name = Debug;
 		};
@@ -553,7 +556,7 @@
 			baseConfigurationReference = BFF6BBE0E509184D483710B4 /* Pods-MLLayoutDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = PDL85JB6BQ;
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = MLLayoutDemo/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.molon.MLLayoutDemo;
