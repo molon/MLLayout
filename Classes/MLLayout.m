@@ -476,7 +476,7 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
     layoutNode(_node, frame.size.width, frame.size.height, CSS_DIRECTION_INHERIT);
     
     NSMutableSet *updatedLayouts = [NSMutableSet set];
-    [self applyLayoutWithUpdatedLayouts:updatedLayouts layoutHelperOffset:CGPointZero absolutePosition:CGPointZero];
+    [self getUpdatedLayoutsWithNewFrame:updatedLayouts layoutHelperOffset:CGPointZero absolutePosition:CGPointZero forceUpdate:NO];
     
     //restore original frame record
     setLayoutFrameRecord(_node, pOrigFrameRecord);
@@ -513,11 +513,12 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
 // absoluteRight = round(absolutePosition.x + viewPosition.left + viewSize.left) + round(106.667 + 0 + 106.667) = 213.5
 // width = 213.5 - 106.5 = 107
 // You'll notice that this is the same width we calculated for the parent view because we've taken its position into account.
-- (void)applyLayoutWithUpdatedLayouts:(NSMutableSet<MLLayout *> *)updatedLayoutsWithNewFrame layoutHelperOffset:(CGPoint)layoutHelperOffset
-                     absolutePosition:(CGPoint)absolutePosition {
-    if (!_node->layout.should_update&&CGPointEqualToPoint(CGPointZero, layoutHelperOffset)) {
-        return;
-    }
+- (void)getUpdatedLayoutsWithNewFrame:(NSMutableSet<MLLayout *> *)updatedLayoutsWithNewFrame layoutHelperOffset:(CGPoint)layoutHelperOffset absolutePosition:(CGPoint)absolutePosition forceUpdate:(BOOL)forceUpdate {
+    //Maybe the `_view.frame` is not equal to the layout frame last calculated,
+    //so we must always check it, we remove the judgment for `should_update`
+    //    if (!_node->layout.should_update&&!forceUpdate) {
+//        return;
+//    }
     _node->layout.should_update = false;
     _layoutLifecycle = MLLayoutLifecycleComputed;
     
@@ -545,12 +546,6 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
     if (_view&&!CGRectEqualToRect(_view.frame, _frame)) {
         [updatedLayoutsWithNewFrame addObject:self];
     }
-    //    if (!CGRectEqualToRect(frame, _frame)) {
-    //        _frame = frame;
-    //        if (_view) {
-    //            [updatedLayoutsWithNewFrame addObject:self];
-    //        }
-    //    }
     
     absolutePosition.x += _node->layout.position[CSS_LEFT] + layoutHelperOffset.x;
     absolutePosition.y += _node->layout.position[CSS_TOP] + layoutHelperOffset.y;
@@ -558,13 +553,13 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
     //if _view is nil, pass orgin to sublayouts
     layoutHelperOffset = !_view?frame.origin:CGPointZero;
     for (MLLayout *sublayout in self.validSublayouts) {
-        [sublayout applyLayoutWithUpdatedLayouts:updatedLayoutsWithNewFrame layoutHelperOffset:layoutHelperOffset absolutePosition:absolutePosition];
+        [sublayout getUpdatedLayoutsWithNewFrame:updatedLayoutsWithNewFrame layoutHelperOffset:layoutHelperOffset absolutePosition:absolutePosition forceUpdate:!_view];
     }
 }
 
 - (void)layoutViewsWithUpdatedLayouts:(NSMutableSet<MLLayout *> *)updatedLayouts {
     for (MLLayout *layout in updatedLayouts) {
-        if (!layout->_invalid) {
+        if (layout->_view&&!layout->_invalid) {
             layout->_view.frame = layout->_frame;
         }
     }
