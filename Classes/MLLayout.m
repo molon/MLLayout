@@ -515,7 +515,7 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
 // You'll notice that this is the same width we calculated for the parent view because we've taken its position into account.
 - (void)getUpdatedLayoutsWithNewFrame:(NSMutableSet<MLLayout *> *)updatedLayoutsWithNewFrame layoutHelperOffset:(CGPoint)layoutHelperOffset absolutePosition:(CGPoint)absolutePosition forceUpdate:(BOOL)forceUpdate {
     //Maybe the `_view.frame` is not equal to the layout frame last calculated,
-    //so we must always check it, we remove the judgment for `should_update`
+    //so we must always check it, we remove the judgment for `should_update`and ensure all layouts to be checked
     //    if (!_node->layout.should_update&&!forceUpdate) {
 //        return;
 //    }
