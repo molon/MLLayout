@@ -1,8 +1,5 @@
 language: objective-c
 osx_image: xcode8
-before_install:
-    - brew update
-    - brew upgrade xctool
 notifications:
   email:
     - dudl@qq.com
@@ -11,11 +8,10 @@ notifications:
 
 podfile: Example/Podfile
 script:
-  xctool
+  xcodebuild
   -workspace Example/MLLayoutDemo.xcworkspace
-  -scheme MLLayoutDemo
-  -sdk iphonesimulator
-  build 
+  -scheme MLLayoutDemo 
+  -sdk iphonesimulator 
   ONLY_ACTIVE_ARCH=NO
   CODE_SIGN_IDENTITY=""
   CODE_SIGNING_REQUIRED=NO
