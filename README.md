@@ -12,7 +12,7 @@ Inspired by [React Native](https://github.com/facebook/react-native).
 - Flexbox is the best way to layout in mobile platform. So many popular libraries use it, eg: [componentkit](https://github.com/facebook/componentkit), [AsyncDisplayKit](https://github.com/facebook/AsyncDisplayKit), [React Native](https://github.com/facebook/react-native), [weex](https://github.com/alibaba/weex) and so on.
 - [React Native](https://github.com/facebook/react-native),[weex](https://github.com/alibaba/weex) and `MLLayout` are based on the C implementation of [facebook/css-layout](https://github.com/facebook/css-layout).
 - Some code references from [React Native](https://github.com/facebook/react-native), eg: snapping to the pixel grid(No misaligned images to improve drawing performance]).
-- `MLLayout` can be only used for layout calculation. Every layout associated with a view usually, the calculation updates frames of layouts. You can use the frames directly or change them. with your mind.
+- `MLLayout` also can be used for layout calculation only. Every layout associated with a view usually, the calculation updates frames of layouts. You can use the frames directly or change them. with your mind.
 - `MLTagViewFrameRecord` can preserve current topology of layouts or views. A prerequisite is that each has a valid tag.
 - Using `MLTagViewFrameRecord` related TableView and TableViewCell can ensure the layout calculation for one row would not be excuted twice unless reloading it explicitly. The feather can improve scrolling performance greatly.
 
