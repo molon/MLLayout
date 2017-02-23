@@ -26,7 +26,9 @@ Inspired by [React Native](https://github.com/facebook/react-native).
 - `MLLayout`也可以只作为以语义化的形式快速计算布局的工具来用，最终计算出的结果使用与否，随心而定。
 - `MLTagViewFrameRecord`可以记录当前的布局结构，但是前提是需要缓存frame的view需要有独特的tag，这样后续才能将记录应用到对应的view上。
 - `MLTagViewFrameRecord`相关的TableView和TableViewCell呢，提供了自动缓存cell布局(当然顺带也有高度啦)的实现，这样的话能保证同一行的布局只会计算一次，除非显式reload。这个能大大的提高列表的滚动性能。
-- 花丁点时间学习一下就会发现使用此库写布局代码量很少，并且会让以后维护成本特别的低，代码结构也利索。大言不惭的说，OC原生下最爽的布局库即为本库，不过教程的确并没有把库里的各个点说明全，不善写文，随着各位兴趣度我再努力添加吧。
+
+花丁点时间学习一下就会发现使用此库写布局代码量很少，并且会让以后维护成本特别的低，代码结构也利索。大言不惭的说，OC原生下最爽的布局库即为本库，不过暂时demo里没有把各个点说全，细节有点多，随着各位兴趣度我再努力添加吧。
+
 `FlexBox教程`: [http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html?utm_source=tuicool](http://www.ruanyifeng.com/blog/2015/07/flex-grammar.html?utm_source=tuicool)
 
 Usage
