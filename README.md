@@ -23,7 +23,7 @@ Inspired by [React Native](https://github.com/facebook/react-native).
 - Flexbox是现今移动端最优的布局方式，像[componentkit](https://github.com/facebook/componentkit), [AsyncDisplayKit](https://github.com/facebook/AsyncDisplayKit), [React Native](https://github.com/facebook/react-native), [weex](https://github.com/alibaba/weex)等等优秀的开源库都在使用此种布局方式。
 - [React Native](https://github.com/facebook/react-native)和[weex](https://github.com/alibaba/weex)以及`MLLayout`都一样是基于facebook开源[facebook/css-layout](https://github.com/facebook/css-layout)的c实现。
 - `MLLayout`的一些代码实现是借鉴于[React Native](https://github.com/facebook/react-native)，例如布局计算结果进行默认像素对齐，提升渲染性能。
-- 对以往纯代码布局的开发者而言，`MLLayout`也可以仅仅作为以语义化的形式快速计算布局的工具，最终计算出的结果使用与否，随心而定。
+- `MLLayout`也可以只作为以语义化的形式快速计算布局的工具来用，最终计算出的结果使用与否，随心而定。
 - `MLTagViewFrameRecord`可以记录当前的布局结构，但是前提是需要缓存frame的view需要有独特的tag，这样后续才能将记录应用到对应的view上。
 - `MLTagViewFrameRecord`相关的TableView和TableViewCell呢，提供了自动缓存cell布局(当然顺带也有高度啦)的实现，这样的话能保证同一行的布局只会计算一次，除非显式reload。这个能大大的提高列表的滚动性能。
 
