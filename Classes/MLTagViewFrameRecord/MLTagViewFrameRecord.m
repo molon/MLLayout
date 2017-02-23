@@ -19,14 +19,20 @@
 
 - (void)layoutTagViewsWithRootView:(UIView*)rootView {
     __block UIView *view;
+    //A layout helper is also a valid MLLayout object, so it must can return a MLTagViewFrameRecord object.
+    //Finally we must check it here.
     if (_tag!=kMLLayoutInvalidTag) {
-        NSArray *views = rootView.superview?rootView.superview.subviews:(rootView?@[rootView]:nil);
-        [views enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            if (((UIView*)obj).tag==_tag) {
-                view = obj;
-                *stop = YES;
-            }
-        }];
+        if (rootView.superview) {
+            view = [rootView.superview viewWithTag:_tag];
+        }else{
+            NSArray *views = rootView?@[rootView]:nil;
+            [views enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+                if (((UIView*)obj).tag==_tag) {
+                    view = obj;
+                    *stop = YES;
+                }
+            }];
+        }
         NSAssert(view, @"\n\n`layoutTagViewsWithRootView:`\nThe record:\n-------\n%@\n--------\nmust be accompanied by one corresponding view.\n\n",self);
         
         if (!CGRectEqualToRect(view.frame, self.frame)) {
@@ -46,6 +52,7 @@
     
     NSMutableArray *subrecords = [NSMutableArray array];
     for (MLTagViewFrameRecord *record in _subrecords) {
+        //if tag equals kMLLayoutInvalidTag here, maybe it's a layout helper who doesn't bind a real view.
         if (record.tag==kMLLayoutInvalidTag) {
             [subrecords addObjectsFromArray:[record realSubrecords]];
         }else{
@@ -108,7 +115,7 @@
 @implementation UIView (MLTagViewFrameRecord)
 
 - (MLTagViewFrameRecord*)exportTagViewFrameRecord {
-    NSAssert(self.tag!=kMLLayoutInvalidTag&&self.tag!=0, @"`exportTagViewFrameRecord` method of `UIView` only supports for view whose tag is not -1/0");
+    NSAssert(self.tag!=kMLLayoutInvalidTag, @"`exportTagViewFrameRecord` method of `UIView` only supports for view whose tag is not -1");
     
     MLTagViewFrameRecord *record = [MLTagViewFrameRecord new];
     record.tag = self.tag;

@@ -30,6 +30,7 @@
     
     //If you want to use `applyTagViewsWithRootView:` method or `exportTagViewFrameRecord` method.
     //You must set different tags to related views.
+#warning if you dont want to use `applyTagViewsWithRootView:` method or `exportTagViewFrameRecord` method, dont need to set tags..
     NSInteger tag = 100;
     
     self.view.backgroundColor = [UIColor colorWithRed:0.918 green:0.918 blue:0.875 alpha:1.000];

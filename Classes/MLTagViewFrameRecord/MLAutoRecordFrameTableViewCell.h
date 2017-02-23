@@ -21,7 +21,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  `layoutSubviews` need to know the indexPath, the indexPath can tells us which frame record cache to be used.
- @warning If no `indexPathForMLAutoRecordFrameBlock`, indicate dont want to use cache to layout
+ @warning If no `indexPathForMLAutoRecordFrameBlock`, indicate dont want to use cache to layout, but the `heightForRowXXX` methods can be still used.`
  */
 @property (nullable, nonatomic, copy)  NSIndexPath * _Nullable (^indexPathForMLAutoRecordFrameBlock)(MLAutoRecordFrameTableViewCell *cell);
 
@@ -46,6 +46,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Get height of indexPath, if cached, return it directly.
+ @warning  `contentView` and its subviews that need to be layouted in the cell must be set a unique tag to support cache.
+ @warning `contentView` must be set with a fit frame at the end of `layoutSubviewsIfNoFrameRecord`(it's height was used as cell height)
  
  @param indexPath    indexPath
  @param tableView    tableView
@@ -57,7 +59,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Get height of indexPath, if cached, return it directly.
- @warning The method only support for cells which has a corresponding nib named NSStringFromClass([cell class])
+ @warning  `contentView` and its subviews that need to be layouted in the cell must be set a unique tag to support cache.
+ @warning `contentView` must be set with a fit frame at the end of `layoutSubviewsIfNoFrameRecord`(it's height was used as cell height)
+ @warning The method only support for cells that has a corresponding nib named NSStringFromClass([cell class])
  
  @param indexPath    indexPath
  @param tableView    tableView
@@ -69,6 +73,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Get height of indexPath, if cached, return it directly.
+ @warning  `contentView` and its subviews that need to be layouted in the cell must be set a unique tag to support cache.
+ @warning `contentView` must be set with a fit frame at the end of `layoutSubviewsIfNoFrameRecord`(it's height was used as cell height)
  
  @param indexPath        indexPath
  @param tableView        tableView
@@ -81,7 +87,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Get height of indexPath, if cached, return it directly.
- @warning The method only support for cells whose all subviews'frame can be determined with it's `layoutOfContentView` property.
+ @warning  `contentView` and its subviews that need to be layouted in the cell must be set a unique tag to support cache.
+ @warning The method only support for cells whose all subviews'frame can be determined with it's `layoutOfContentView` property. If you stubbornly want to custom frames of some views, please do it in `layoutSubviews` and ensure the `layoutOfContentView` can determine `contentView`'s height(it was used as cell height).
  
  @param indexPath    indexPath
  @param tableView    tableView
@@ -93,8 +100,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Get height of indexPath, if cached, return it directly.
- @warning The method only support for cells whose all subviews'frame can be determined with it's `layoutOfContentView` property.
- @warning The method only support for cells which has a corresponding nib named NSStringFromClass([cell class])
+ @warning  `contentView` and its subviews that need to be layouted in the cell must be set a unique tag to support cache.
+ @warning The method only support for cells whose all subviews'frame can be determined with it's `layoutOfContentView` property. If you stubbornly want to custom frames of some views, please do it in `layoutSubviews` and ensure the `layoutOfContentView` can determine `contentView`'s height(it was used as cell height).
+ @warning The method only support for cells that has a corresponding nib named NSStringFromClass([cell class])
  
  @param indexPath    indexPath
  @param tableView    tableView
@@ -106,7 +114,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Get height of indexPath, if cached, return it directly.
- @warning The method only support for cells whose all subviews'frame can be determined with it's `layoutOfContentView` property.
+ @warning  `contentView` and its subviews that need to be layouted in the cell must be set a unique tag to support cache.
+ @warning The method only support for cells whose all subviews'frame can be determined with it's `layoutOfContentView` property. If you stubbornly want to custom frames of some views, please do it in `layoutSubviews` and ensure the `layoutOfContentView` can determine `contentView`'s height(it was used as cell height).
  
  @param indexPath        indexPath
  @param tableView        tableView

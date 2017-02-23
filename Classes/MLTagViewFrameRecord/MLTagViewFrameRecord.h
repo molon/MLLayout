@@ -50,7 +50,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  Export frame records of self and descendants
- @warning views with tag==0 will be ignored!!!!!
+ @warning views with tag==0 and their descendants will be ignored, because we dont want to cache all descendants like default UIButtonLabel!!!!!
  
  @return record
  */
