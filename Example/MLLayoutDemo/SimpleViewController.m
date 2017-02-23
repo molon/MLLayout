@@ -181,29 +181,27 @@
 
 - (void)displaySwitchButtonClicked {
     {
-    //Invalidate a layout temporarily
-    //Tips: MLLayout'view is a weak property. so please ensure that the associated view doesn't release when it's layout in use.
-    _imageView.hidden = !_imageView.hidden;
-    [_layout retrieveLayoutWithView:_imageView].invalid = _imageView.hidden;
+        //Invalidate a layout temporarily
+      [_layout retrieveLayoutWithView:_imageView].invalid = _imageView.hidden = !_imageView.hidden;
     
-    //A long-winded implementation
-//    if (_imageView.superview) {
-//        [_imageView removeFromSuperview];
-//        [[_layout retrieveLayoutWithView:_imageView]removeFromSuperlayout];
-//    }else{
-//        [self.view addSubview:_imageView];
-//        [_layout insertSublayout:[MLLayout layoutWithTagView:_imageView block:^(MLLayout * _Nonnull l) {
-//            //test MLLayoutPositionRelative
-//            l.position = MLLayoutPositionRelative;
-//            l.bottom = 10.0f;
-//        }] atIndex:1];
-//    }
+        //A long-winded implementation
+#warning We will not do like this, here is only used to explain the benefits of `invalid` property
+//        if (!_imageView.hidden) {
+//            [[_layout retrieveLayoutWithView:_imageView]removeFromSuperlayout];
+//        }else{
+//            [_layout insertSublayout:[MLLayout layoutWithTagView:_imageView block:^(MLLayout * _Nonnull l) {
+//                //test MLLayoutPositionRelative
+//                l.position = MLLayoutPositionRelative;
+//                l.height = 50.0f; //test auto fit width
+//                l.bottom = 10.0f;
+//            }] atIndex:1];
+//        }
+//        _imageView.hidden = !_imageView.hidden;
     }
     
     //other test
     {
-//        _bkgView.hidden = !_bkgView.hidden;
-//        [_layout retrieveLayoutWithView:_bkgView].invalid = _bkgView.hidden;
+//        [_layout retrieveLayoutWithView:_bkgView].invalid = _bkgView.hidden = !_bkgView.hidden;
     }
     
     [self.view setNeedsLayout];
