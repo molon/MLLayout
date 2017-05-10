@@ -128,16 +128,16 @@
             l.margin = UIEdgeInsetsMake(5.0f, 0, 0, 30.0f);
             l.sublayouts = @[
                              [MLLayout layoutWithTagView:_replyButton block:^(MLLayout * _Nonnull l) {
-                                 l.minWidth = 50.0f;
-                                 l.minHeight = 20.0f;
+                                 l.minWidth = kButtonMinWidth;
+                                 l.minHeight = kButtonMinHeight;
                              }],
                              [MLLayout layoutWithTagView:_retweetButton block:^(MLLayout * _Nonnull l) {
-                                 l.minWidth = 50.0f;
-                                 l.minHeight = 20.0f;
+                                 l.minWidth = kButtonMinWidth;
+                                 l.minHeight = kButtonMinHeight;
                              }],
                              [MLLayout layoutWithTagView:_favButton block:^(MLLayout * _Nonnull l) {
-                                 l.minWidth = 50.0f;
-                                 l.minHeight = 20.0f;
+                                 l.minWidth = kButtonMinWidth;
+                                 l.minHeight = kButtonMinHeight;
                              }],
                              ];
         }];

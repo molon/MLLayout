@@ -106,7 +106,6 @@ static inline BOOL isRectEqualToRect (CGRect r1,CGRect r2) {
 
 @interface MLLayout()
 
-@property (nonatomic, weak) UIView *view;
 @property (nonatomic, assign) CGRect frame;
 
 @property (nonatomic, assign) CGRect lastMeasureFrame;
@@ -316,6 +315,18 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
     [self resetValidSublayouts];
     
     [sublayout dirtyLayout];
+}
+
+- (void)insertSublayout:(MLLayout *)sublayout aboveSublayout:(MLLayout*)siblingSublayout {
+    NSInteger index = _sublayouts?[_sublayouts indexOfObject:siblingSublayout]:NSNotFound;
+    NSAssert(index!=NSNotFound, @"The aboveSublayout is not a sublayout!");
+    [self insertSublayout:sublayout atIndex:index+1];
+}
+
+- (void)insertSublayout:(MLLayout *)sublayout belowSublayout:(MLLayout*)siblingSublayout {
+    NSInteger index = _sublayouts?[_sublayouts indexOfObject:siblingSublayout]:NSNotFound;
+    NSAssert(index!=NSNotFound, @"The belowSublayout is not a sublayout!");
+    [self insertSublayout:sublayout atIndex:index];
 }
 
 - (void)addSublayout:(MLLayout*)sublayout {
@@ -783,7 +794,7 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
             l.view = nil;
         } forLayout:self];
     }
-    //`view` is readonly, the last view tag is always valid, dont need to reset to invalid
+    // The last tag is always meaningful,so we will not reset it
     //    else{
     //        _tag = kMLLayoutInvalidTag;
     //    }
@@ -793,8 +804,7 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
     [self dirtyLayout];
 }
 
-- (void)setMeasure:(CGSize (^)(MLLayout * _Nonnull, CGFloat, MLLayoutMeasureMode, CGFloat, MLLayoutMeasureMode))measure
-{
+- (void)setMeasure:(CGSize (^)(MLLayout * _Nonnull, CGFloat, MLLayoutMeasureMode, CGFloat, MLLayoutMeasureMode))measure {
     _measure = [measure copy];
     
     _node->measure = [self hasMeasure]?measureNode:NULL;

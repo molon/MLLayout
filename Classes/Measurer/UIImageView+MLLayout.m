@@ -6,7 +6,6 @@
 //
 
 #import "UIImageView+MLLayout.h"
-#import "MLLayout.h"
 #import "MLLayoutMacro.h"
 
 MLLAYOUT_SYNTH_DUMMY_CLASS(UIImageView_MLLayout)
@@ -44,10 +43,6 @@ MLLAYOUT_SYNTH_DUMMY_CLASS(UIImageView_MLLayout)
         
         fitSize.width = fitSize.height*ratio;
     }
-    
-    //TODO: maybe the size will be narrowed because of `roundPixelValue`, is it will cannot fit size after narrowed?
-    //    size.width = ceil(size.width);
-    //    size.height = ceil(size.height);
     
     return fitSize;
 }

@@ -6,7 +6,6 @@
 //
 
 #import "UILabel+MLLayout.h"
-#import "MLLayout.h"
 #import "MLLayoutMacro.h"
 
 MLLAYOUT_SYNTH_DUMMY_CLASS(UILabel_MLLayout)
@@ -33,10 +32,6 @@ MLLAYOUT_SYNTH_DUMMY_CLASS(UILabel_MLLayout)
     //maybe the fit result is bigger than measure size
     fitSize.width = fmin(size.width, fitSize.width);
     fitSize.height = fmin(size.height, fitSize.height);
-    
-    //TODO: maybe the size will be narrowed because of `roundPixelValue`, is it will cannot fit size after narrowed?
-//    size.width = ceil(size.width);
-//    size.height = ceil(size.height);
     
     return fitSize;
 }

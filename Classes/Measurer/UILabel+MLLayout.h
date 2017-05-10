@@ -6,6 +6,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "MLLayout.h"
 
 @interface UILabel (MLLayout)
+- (CGSize)measureWithMLLayout:(MLLayout*)layout width:(CGFloat)width widthMode:(MLLayoutMeasureMode)widthMode height:(CGFloat)height heightMode:(MLLayoutMeasureMode)heightMode;
 @end

@@ -172,7 +172,7 @@ typedef NS_OPTIONS(NSUInteger, MLLayoutDebugMode) {
 /**
  the associated view, if nil, the layout becomes a layout helper
  */
-@property (nullable, nonatomic, weak, readonly) UIView *view;
+@property (nullable, nonatomic, weak) UIView *view;
 
 /**
  tag
@@ -441,6 +441,22 @@ typedef NS_OPTIONS(NSUInteger, MLLayoutDebugMode) {
  @param index     index
  */
 - (void)insertSublayout:(MLLayout*)sublayout atIndex:(NSInteger)index;
+
+/**
+ insert a sublayout above another sublayout
+ 
+ @param sublayout sublayout
+ @param siblingSublayout     siblingSublayout
+ */
+- (void)insertSublayout:(MLLayout *)sublayout aboveSublayout:(MLLayout*)siblingSublayout;
+
+/**
+ insert a sublayout below another sublayout
+ 
+ @param sublayout sublayout
+ @param siblingSublayout     siblingSublayout
+ */
+- (void)insertSublayout:(MLLayout *)sublayout belowSublayout:(MLLayout*)siblingSublayout;
 
 /**
  add a sublayout
