@@ -473,7 +473,19 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
     style_frame_record_t *pOrigFrameRecord = &record;
     
     // Ensure the frame record below to layout
-    style_frame_record_t newFrameRecord = (style_frame_record_t){CSS_POSITION_ABSOLUTE,frame.origin.x,frame.origin.y,frame.size.width,frame.size.height};
+    float (^min)(float a, float b) = ^(float a, float b) {
+        if (isUndefined(a)) {
+            return b;
+        }else if (isUndefined(b)) {
+            return a;
+        }
+        return (float)fmin(a, b);
+    };
+    // The orig width/height limit is meaningful, so we keep it.
+    style_frame_record_t newFrameRecord = (style_frame_record_t){CSS_POSITION_ABSOLUTE,frame.origin.x,frame.origin.y,
+        min(frame.size.width, pOrigFrameRecord->width),
+        min(frame.size.height, pOrigFrameRecord->height)
+    };
     setLayoutFrameRecord(_node, &newFrameRecord);
     
     if (!isRectEqualToRect(frame, _lastMeasureFrame)) {
