@@ -10,6 +10,12 @@
 #import "MLAutoRecordFrameTableView.h"
 #import "MLLayout.h"
 
+@interface MLAutoRecordFrameTableViewCell()
+
+@property (nonatomic, assign) BOOL dontUseCachedMLTagViewFrameRecord;
+
+@end
+
 @implementation MLAutoRecordFrameTableViewCell
 
 - (void)layoutSubviews {
@@ -17,7 +23,7 @@
     
     UITableView *tableView = [self currentTableView];
     NSIndexPath *indexPath = nil;
-    if ([tableView isKindOfClass:[MLAutoRecordFrameTableView class]]&&self.indexPathForMLAutoRecordFrameBlock) {
+    if (!self.dontUseCachedMLTagViewFrameRecord&&[tableView isKindOfClass:[MLAutoRecordFrameTableView class]]&&self.indexPathForMLAutoRecordFrameBlock) {
         //If no indexPathForMLAutoRecordFrameBlock, indicate dont want to use cache to layout
         indexPath = self.indexPathForMLAutoRecordFrameBlock(self);
         //If indexPathForMLAutoRecordFrameBlock return nil, indicate current `layoutSubviews` is not necessary, just return.

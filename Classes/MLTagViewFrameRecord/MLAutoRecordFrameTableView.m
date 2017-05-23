@@ -7,6 +7,7 @@
 
 #import "MLAutoRecordFrameTableView.h"
 #import "MLTagViewFrameRecord.h"
+#import "MLAutoRecordFrameTableViewCell.h"
 
 static inline void insertIndexToDictionary(NSInteger index, NSMutableDictionary *dictionary) {
     if (!dictionary) {
@@ -42,6 +43,12 @@ static inline void deleteIndexFromDictionary(NSInteger index, NSMutableDictionar
         }
     }
 }
+
+@interface MLAutoRecordFrameTableViewCell(Private)
+
+@property (nonatomic, assign) BOOL dontUseCachedMLTagViewFrameRecord;
+
+@end
 
 @interface MLTagViewFrameRecordForCellManager : NSObject
 
@@ -137,7 +144,26 @@ static inline void deleteIndexFromDictionary(NSInteger index, NSMutableDictionar
         }];
         [self.tagViewFrameRecordForCellManager.records removeObjectsForKeys:keys];
     }
+    
+    //Current visible cells with sections would be replaced with new cells.
+    //But their `layoutSubviews` would be called in reloading, so the cache records may be not valid for them, we need to disable their cache support temporarily.
+    //TODO: maybe we need better way to solve this issue
+    NSMutableArray *needRestoreCells = [NSMutableArray array];
+    for (NSIndexPath *indexPath in [self indexPathsForVisibleRows]) {
+        if ([sections containsIndex:indexPath.section]) {
+            UITableViewCell *cell = [self cellForRowAtIndexPath:indexPath];
+            if ([cell isKindOfClass:[MLAutoRecordFrameTableViewCell class]]) {
+                ((MLAutoRecordFrameTableViewCell*)cell).dontUseCachedMLTagViewFrameRecord = YES;
+                [needRestoreCells addObject:cell];
+            }
+        }
+    }
+    
     [super reloadSections:sections withRowAnimation:animation];
+    
+    for (MLAutoRecordFrameTableViewCell *cell in needRestoreCells) {
+        cell.dontUseCachedMLTagViewFrameRecord = NO;
+    }
 }
 
 - (void)moveSection:(NSInteger)section toSection:(NSInteger)newSection {
@@ -226,7 +252,25 @@ static inline void deleteIndexFromDictionary(NSInteger index, NSMutableDictionar
         }
     }
     
+    //Current visible cells with indexPaths would be replaced with new cells.
+    //But their `layoutSubviews` would be called in reloading, so the cache records may be not valid for them, we need to disable their cache support temporarily.
+    //TODO: maybe we need better way to solve this issue
+    NSMutableArray *needRestoreCells = [NSMutableArray array];
+    for (NSIndexPath *indexPath in [self indexPathsForVisibleRows]) {
+        if ([indexPaths containsObject:indexPath]) {
+            UITableViewCell *cell = [self cellForRowAtIndexPath:indexPath];
+            if ([cell isKindOfClass:[MLAutoRecordFrameTableViewCell class]]) {
+                ((MLAutoRecordFrameTableViewCell*)cell).dontUseCachedMLTagViewFrameRecord = YES;
+                [needRestoreCells addObject:cell];
+            }
+        }
+    }
+    
     [super reloadRowsAtIndexPaths:indexPaths withRowAnimation:animation];
+
+    for (MLAutoRecordFrameTableViewCell *cell in needRestoreCells) {
+        cell.dontUseCachedMLTagViewFrameRecord = NO;
+    }
 }
 
 - (void)moveRowAtIndexPath:(NSIndexPath *)indexPath toIndexPath:(NSIndexPath *)newIndexPath {
