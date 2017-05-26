@@ -154,64 +154,76 @@
     return frameRecord.frame.size.height;
 }
 
-static inline MLAutoRecordFrameTableViewCell *kProtypeAutoRecordFrameTableViewCell(Class cls) {
+static inline MLAutoRecordFrameTableViewCell *kProtypeAutoRecordFrameTableViewCell(Class cls,UITableView *tableView) {
     NSCAssert([cls isSubclassOfClass:[MLAutoRecordFrameTableViewCell class]], @"cls must be subclass of `MLAutoRecordFrameTableViewCell` class");
     
-    static NSMutableDictionary *protypeCells = nil;
+    static NSMapTable *protypeCells = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        protypeCells = [NSMutableDictionary dictionary];
+        protypeCells = [NSMapTable weakToStrongObjectsMapTable];
     });
     
+    NSMutableDictionary *dict = [protypeCells objectForKey:tableView];
+    if (!dict) {
+        dict = [NSMutableDictionary dictionaryWithCapacity:1];
+        [protypeCells setObject:dict forKey:tableView];
+    }
+    
     NSString *clsName = NSStringFromClass(cls);
-    MLAutoRecordFrameTableViewCell *protypeCell = protypeCells[clsName];
+    MLAutoRecordFrameTableViewCell *protypeCell = dict[clsName];
     if (!protypeCell) {
         protypeCell = [cls new];
-        protypeCells[clsName] = protypeCell;
+        dict[clsName] = protypeCell;
     }
     return protypeCell;
 }
 
 + (CGFloat)heightForRowAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(MLAutoRecordFrameTableViewCell *protypeCell))beforeLayout {
     return [self heightForRowAtIndexPath:indexPath tableView:tableView protypeCellBlock:^MLAutoRecordFrameTableViewCell *(__unsafe_unretained Class cellCls) {
-        return kProtypeAutoRecordFrameTableViewCell(cellCls);
+        return kProtypeAutoRecordFrameTableViewCell(cellCls,tableView);
     } beforeLayout:beforeLayout];
 }
 
 + (CGFloat)heightForRowUsingPureMLLayoutAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(MLAutoRecordFrameTableViewCell *protypeCell))beforeLayout {
     return [self heightForRowUsingPureMLLayoutAtIndexPath:indexPath tableView:tableView protypeCellBlock:^MLAutoRecordFrameTableViewCell *(__unsafe_unretained Class cellCls) {
-        return kProtypeAutoRecordFrameTableViewCell(cellCls);
+        return kProtypeAutoRecordFrameTableViewCell(cellCls,tableView);
     } beforeLayout:beforeLayout];
 }
 
-static inline MLAutoRecordFrameTableViewCell *kProtypeAutoRecordFrameTableViewCellFromNib(Class cls) {
+static inline MLAutoRecordFrameTableViewCell *kProtypeAutoRecordFrameTableViewCellFromNib(Class cls,UITableView *tableView) {
     NSCAssert([cls isSubclassOfClass:[MLAutoRecordFrameTableViewCell class]], @"cls must be subclass of `MLAutoRecordFrameTableViewCell` class");
     
-    static NSMutableDictionary *protypeCells = nil;
+    static NSMapTable *protypeCells = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        protypeCells = [NSMutableDictionary dictionary];
+        protypeCells = [NSMapTable weakToStrongObjectsMapTable];
     });
     
+    NSMutableDictionary *dict = [protypeCells objectForKey:tableView];
+    if (!dict) {
+        dict = [NSMutableDictionary dictionaryWithCapacity:1];
+        [protypeCells setObject:dict forKey:tableView];
+    }
+    
     NSString *clsName = NSStringFromClass(cls);
-    MLAutoRecordFrameTableViewCell *protypeCell = protypeCells[clsName];
+    MLAutoRecordFrameTableViewCell *protypeCell = dict[clsName];
     if (!protypeCell) {
         protypeCell = [[[NSBundle mainBundle]loadNibNamed:clsName owner:nil options:nil]lastObject];
         NSCAssert(protypeCell, @"Cant find a valid tableViewCell from nib named %@",clsName);
-        protypeCells[clsName] = protypeCell;
+        dict[clsName] = protypeCell;
     }
     return protypeCell;
 }
 
 + (CGFloat)heightForRowFromNibAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(MLAutoRecordFrameTableViewCell *protypeCell))beforeLayout {
     return [self heightForRowAtIndexPath:indexPath tableView:tableView protypeCellBlock:^MLAutoRecordFrameTableViewCell *(__unsafe_unretained Class cellCls) {
-        return kProtypeAutoRecordFrameTableViewCellFromNib(cellCls);
+        return kProtypeAutoRecordFrameTableViewCellFromNib(cellCls,tableView);
     } beforeLayout:beforeLayout];
 }
 
 + (CGFloat)heightForRowUsingPureMLLayoutFromNibAtIndexPath:(NSIndexPath*)indexPath tableView:(MLAutoRecordFrameTableView*)tableView beforeLayout:(nullable void (^)(MLAutoRecordFrameTableViewCell *protypeCell))beforeLayout {
     return [self heightForRowUsingPureMLLayoutAtIndexPath:indexPath tableView:tableView protypeCellBlock:^MLAutoRecordFrameTableViewCell *(__unsafe_unretained Class cellCls) {
-        return kProtypeAutoRecordFrameTableViewCellFromNib(cellCls);
+        return kProtypeAutoRecordFrameTableViewCellFromNib(cellCls,tableView);
     } beforeLayout:beforeLayout];
 }
 @end
