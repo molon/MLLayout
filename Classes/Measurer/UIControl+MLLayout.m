@@ -1,16 +1,17 @@
 //
-//  UIButton+MLLayout.m
+//  UIControl+MLLayout.m
+//  Pods
 //
-//  Created by molon on 16/6/23.
-//  Copyright © 2016年 molon. All rights reserved.
+//  Created by molon on 2017/5/31.
+//
 //
 
-#import "UIButton+MLLayout.h"
+#import "UIControl+MLLayout.h"
 #import "MLLayoutMacro.h"
 
-MLLAYOUT_SYNTH_DUMMY_CLASS(UIButton_MLLayout)
+MLLAYOUT_SYNTH_DUMMY_CLASS(UIControl_MLLayout)
 
-@implementation UIButton (MLLayout)
+@implementation UIControl (MLLayout)
 
 - (CGSize)measureWithMLLayout:(MLLayout*)layout width:(CGFloat)width widthMode:(MLLayoutMeasureMode)widthMode height:(CGFloat)height heightMode:(MLLayoutMeasureMode)heightMode {
     
@@ -28,8 +29,9 @@ MLLAYOUT_SYNTH_DUMMY_CLASS(UIButton_MLLayout)
     size.height = dimensionClamp(layout.minHeight,layout.maxHeight,size.height);
     
     /*
-     As it says in the documentation, for `titleEdgeInsets`: 
-     "The button does not use this property to determine intrinsicContentSize and sizeThatFits:". 
+     If self is UIButton
+     As it says in the documentation, for `titleEdgeInsets`:
+     "The button does not use this property to determine intrinsicContentSize and sizeThatFits:".
      So, setting the `titleEdgeInsets` just moves the title label, but doesn't affect the size of the button.
      If you want the button to have more padding around the content, set the `contentEdgeInsets` as well.
      [button setTitleEdgeInsets:UIEdgeInsetsMake(0, 4, 0, -4)];
