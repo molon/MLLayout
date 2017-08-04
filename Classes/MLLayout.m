@@ -281,7 +281,7 @@ static css_dim_t measureNode(void *context, float width, css_measure_mode_t widt
     NSMutableArray *layouts = [NSMutableArray array];
     for (MLLayout *sublayout in _sublayouts) {
         if (comparator(sublayout)) {
-            [layouts addObject:comparator];
+            [layouts addObject:sublayout];
         }
         [layouts addObjectsFromArray:[sublayout retrieveDescendantsPassingTest:comparator]];
     }

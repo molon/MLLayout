@@ -1,5 +1,5 @@
 PODS:
-  - MLLayout (0.4.1)
+  - MLLayout (0.4.4)
   - SDWebImage (3.8.2):
     - SDWebImage/Core (= 3.8.2)
   - SDWebImage/Core (3.8.2)
@@ -13,9 +13,9 @@ EXTERNAL SOURCES:
     :path: "../MLLayout.podspec"
 
 SPEC CHECKSUMS:
-  MLLayout: 65a0e2f3540138bf6de1c624988b4104999668da
+  MLLayout: 94005c18e4d63c4fa3536fef7fd2d9cef84a5449
   SDWebImage: 098e97e6176540799c27e804c96653ee0833d13c
 
 PODFILE CHECKSUM: 8865c6aa8dd9b55ece9645cfde9f065dee1415d4
 
-COCOAPODS: 1.2.0
+COCOAPODS: 1.2.1
