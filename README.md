@@ -89,7 +89,7 @@ MLLayout *bkgViewLayout = [MLLayout layoutWithTagView:_bkgView block:^(MLLayout 
 
 ![TweetListViewController](https://github.com/molon/MLLayout/blob/master/TweetListViewController.gif?raw=true)
 
-The demo uses `MLLayout` to layout subviews of cells and `MLTagViewFrameRecord` to preserve all layout result. Ensure that the layout calculation for one row would not be excuted twice unless reloading it explicitly. The feather can improve scrolling performance greatly.
+The demo uses `MLLayout` to layout subviews of cells and `MLTagViewFrameRecord` to preserve all layout result. Ensure that the layout calculation for one row would not be excuted twice unless reloading it explicitly. The feature can improve scrolling performance greatly.
 
 
 Installation
