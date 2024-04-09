@@ -18,7 +18,7 @@ Inspired by [React Native](https://github.com/facebook/react-native).
 
 `FlexBox Guide`: [https://css-tricks.com/snippets/css/a-guide-to-flexbox/](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
 
-##中文介绍
+## 中文介绍
 
 - Flexbox是现今移动端最优的布局方式，像[componentkit](https://github.com/facebook/componentkit), [AsyncDisplayKit](https://github.com/facebook/AsyncDisplayKit), [React Native](https://github.com/facebook/react-native), [weex](https://github.com/alibaba/weex)等等优秀的开源库都在使用此种布局方式。
 - [React Native](https://github.com/facebook/react-native)和[weex](https://github.com/alibaba/weex)以及`MLLayout`都一样是基于facebook开源[facebook/css-layout](https://github.com/facebook/css-layout)的c实现。
